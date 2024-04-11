@@ -6,6 +6,8 @@ import { examRoute } from './Exam/examRoute'
 import { exam_structureRoute } from './Exam/exam_structureRoute'
 import { question_bankRoute } from './Exam/question_bankRoute'
 import { student_examRoute } from './Exam/student_examRoute'
+import { contestRoute } from './Examination/contestRoute'
+import { organize_examRoute } from './Examination/organize_examRoute'
 import { moduleRoute } from './Module/moduleRoute'
 import { teaching_groupRoute } from './Module/teaching_groupRoute'
 import { authRoute } from './authRoute'
@@ -104,5 +106,11 @@ Router.use('/studentcodes', studentcodeRoute);
 
 /**student_exam APIs */
 Router.use('/student_exams', student_examRoute);
+
+/**contest APIs */
+Router.use('/contests', contestRoute);
+
+/**organize_exam APIs */
+Router.use('/organize_exams', organize_examRoute);
 
 export const APIs_V1 = Router

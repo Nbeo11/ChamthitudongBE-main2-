@@ -7,16 +7,12 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        organize_examId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        totalscore: Joi.number().required().min(1),
-        question: Joi.array().items(
-            Joi.object({
-                question_bankId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-                question_score: Joi.number().required().min(0).max(100),
-            })
-        ).min(1).required(),
-        examstatus: Joi.number().valid(1, 2, 3).default(1)
+        scholastic: Joi.string().required().min(1).max(50).trim().strict(),
+        semester: Joi.string().required().min(1).max(50).trim().strict(),
+        contest_name: Joi.string().required().min(1).max(50).trim().strict(),
+        start_time: Joi.date().required().iso(), // định dạng DD/MM/YYYY
+        end_time: Joi.date().required().iso(),
+
     })
 
     try {
@@ -29,16 +25,12 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        totalscore: Joi.number().min(1),
-        question: Joi.array().items(
-            Joi.object({
-                question_bankId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-                question_score: Joi.number().min(0).max(100),
-            })
-        ).min(1),
-        examstatus: Joi.number().valid(1, 2, 3).default(1),
+        scholastic: Joi.string().min(1).max(50).trim().strict(),
+        semester: Joi.string().min(1).max(50).trim().strict(),
+        contest_name: Joi.string().min(1).max(50).trim().strict(),
+        start_time: Joi.date().iso(), // định dạng DD/MM/YYYY
+        end_time: Joi.date().iso(),
+
     })
 
     try {
@@ -68,7 +60,7 @@ const deleteItem = async (req, res, next) => {
 
 }
 
-export const examValidation = {
+export const contestValidation = {
     createNew,
     update,
     deleteItem

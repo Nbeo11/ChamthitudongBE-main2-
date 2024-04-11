@@ -4,20 +4,15 @@
 import Joi from 'joi';
 import { ObjectId } from 'mongodb';
 import { GET_DB } from '~/config/mongodb';
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 
 //Define Collection (Name & Schema)
 const CONTEST_COLLECTION_NAME = 'contests'
 const CONTEST_COLLECTION_SCHEMA = Joi.object({
-    moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    totalscore: Joi.number().required().min(1),
-    question: Joi.array().items(
-        Joi.object({
-            question_bankId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-            question_score: Joi.number().required().min(0).max(100),
-        })
-    ).min(1),
-    examstatus: Joi.number().valid(1, 2, 3).default(1),
+    scholastic: Joi.string().required().min(1).max(50).trim().strict(),
+    semester: Joi.string().required().min(1).max(50).trim().strict(),
+    contest_name: Joi.string().required().min(1).max(50).trim().strict(),
+    start_time: Joi.date().required().iso(), // định dạng DD/MM/YYYY
+    end_time: Joi.date().required().iso(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
@@ -38,11 +33,6 @@ const createNew = async (data) => {
         //Biến đổi một số dữ liệu liên quan tới OjectId chuẩn chỉnh
         const newContestToAdd = {
             ...validData,
-            moduleId: new ObjectId(validData.moduleId),
-            question: validData.question.map(item => ({
-                ...item,
-                question_bankId: new ObjectId(item.question_bankId) // Chuyển đổi question_bankId sang ObjectId
-            }))
         }
         const createdContest = await GET_DB().collection(CONTEST_COLLECTION_NAME).insertOne(newContestToAdd)
 

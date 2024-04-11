@@ -5,7 +5,9 @@ import Joi from 'joi';
 import { ObjectId } from 'mongodb';
 import { GET_DB } from '~/config/mongodb';
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
+import { organize_examModel } from '../Examination/organize_examModel';
 import { studentcodeModel } from '../code/studentcodeModel';
+import { studentModel } from '../studentModel';
 import { examModel } from './examModel';
 
 //Define Collection (Name & Schema)
@@ -13,6 +15,13 @@ const STUDENT_EXAM_COLLECTION_NAME = 'student_exams'
 const STUDENT_EXAM_COLLECTION_SCHEMA = Joi.object({
     studentId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     examId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    time_countdown: Joi.number().integer().min(0),
+    exam_date: Joi.date().iso(),
+    exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
+    exam_end: Joi.date(),
+    room: Joi.string().min(1).max(50).trim().strict(),
     question: Joi.array().items(
         Joi.object({
             question_bankId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -42,18 +51,40 @@ const createNew = async (data) => {
 
         // Nếu tồn tại examId
         if (validData.examId) {
+
+            const student = await studentModel.findOneById(newStudent_examToAdd.studentId)
+            const gradeId = student.gradeId
+
             // Lấy dữ liệu của exam từ examModel
             const exam = await examModel.findOneById(validData.examId);
 
             // Sao chép giá trị của mảng question từ exam sang student_exam
             newStudent_examToAdd.question = exam.question;
+            newStudent_examToAdd.organize_examId = exam.organize_examId;
+            newStudent_examToAdd.moduleId = exam.moduleId;
+            const organize_exam = await organize_examModel.findOneById(exam.organize_examId);
+            newStudent_examToAdd.time_countdown = organize_exam.time_countdown;
+            const detailData = organize_exam.details.find(item => item.gradeId.equals(new ObjectId(gradeId)))
+            if (detailData) {
+                newStudent_examToAdd.exam_date = detailData.exam_date;
+                newStudent_examToAdd.exam_start = detailData.exam_start;
+                newStudent_examToAdd.exam_end = detailData.exam_end;
+                newStudent_examToAdd.room = detailData.room;
+
+            } else {
+                console.log('No grade found')
+            }
+            console.log(detailData)
         }
+
 
         // Chuyển đổi các giá trị ObjectId
         newStudent_examToAdd = {
             ...newStudent_examToAdd,
             examId: new ObjectId(newStudent_examToAdd.examId),
             studentId: new ObjectId(newStudent_examToAdd.studentId),
+            moduleId: new ObjectId(newStudent_examToAdd.moduleId),
+            organize_examId: new ObjectId(newStudent_examToAdd.organize_examId),
             question: newStudent_examToAdd.question.map(item => ({
                 ...item,
                 question_bankId: new ObjectId(item.question_bankId)
@@ -182,10 +213,10 @@ const calculateAndUpdateFinalScore = async (student_examId) => {
         // Tính tổng scoregot
         let totalScore = 0;
         for (const studentCode of studentCodes) {
-                totalScore += studentCode.scoregot || 0;
-                console.log ('totalScore: ', studentCode.scoregot)
+            totalScore += studentCode.scoregot || 0;
+            console.log('totalScore: ', studentCode.scoregot)
         }
-        console.log ('finalscore: ', totalScore)
+        console.log('finalscore: ', totalScore)
         // Cập nhật finalscore vào student_exam
         const result = await GET_DB().collection(STUDENT_EXAM_COLLECTION_NAME).findOneAndUpdate(
             { _id: new ObjectId(student_examId) },

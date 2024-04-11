@@ -9,6 +9,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 //Define Collection (Name & Schema)
 const EXAM_COLLECTION_NAME = 'exams'
 const EXAM_COLLECTION_SCHEMA = Joi.object({
+    organize_examId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     totalscore: Joi.number().required().min(1),
     question: Joi.array().items(
@@ -16,7 +17,7 @@ const EXAM_COLLECTION_SCHEMA = Joi.object({
             question_bankId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             question_score: Joi.number().required().min(0).max(100),
         })
-    ).min(1),
+    ).min(1).required(),
     examstatus: Joi.number().valid(1, 2, 3).default(1),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -39,6 +40,7 @@ const createNew = async (data) => {
         const newExamToAdd = {
             ...validData,
             moduleId: new ObjectId(validData.moduleId),
+            organize_examId: new ObjectId(validData.organize_examId),
             question: validData.question.map(item => ({
                 ...item,
                 question_bankId: new ObjectId(item.question_bankId) // Chuyển đổi question_bankId sang ObjectId
