@@ -82,6 +82,29 @@ const getDetails = async (id) => {
     } catch (error) { throw new Error(error) }
 }
 
+const getDetailByGradeId = async (gradeId) => {
+    try {
+        const allOrganize_exams = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).find().toArray();
+        
+        // Lặp qua từng bản ghi organize_exam để tìm thông tin của gradeId
+        const detailsArray = allOrganize_exams.reduce((acc, curr) => acc.concat(curr.details), []);
+
+        // Tìm thông tin của gradeId trong mảng details
+        const detail = detailsArray.find(detail => detail.gradeId === gradeId);
+
+        if (detail) {
+            // Nếu tìm thấy, trả về thông tin contestId, moduleId và time_countdown tương ứng
+            const { contestId, moduleId, time_countdown } = detail;
+            return { contestId, moduleId, time_countdown };
+        } else {
+            // Nếu không tìm thấy, trả về null
+            return null;
+        }
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw new Error(error);
+    }
+}
 
 const update = async (organize_examId, updateData) => {
     try {
@@ -129,6 +152,7 @@ export const organize_examModel = {
     createNew,
     findOneById,
     getDetails,
+    getDetailByGradeId,
     getAllOrganize_exams,
     update,
     deleteOneById,

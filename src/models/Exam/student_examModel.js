@@ -99,6 +99,63 @@ const createNew = async (data) => {
         throw new Error(error);
     }
 };
+
+
+const assignRandomExamToStudent = async () => {
+    try {
+        // Lấy danh sách sinh viên và đề thi
+        const allStudents = await studentModel.getAllStudents();
+        const allExams = await examModel.getAllExams();
+
+        // Số lượng sinh viên và đề thi
+        const numStudents = allStudents.length;
+        const numExams = allExams.length;
+
+        if (numExams >= numStudents) {
+            // Thực hiện gán mỗi sinh viên một đề khác nhau
+            for (let i = 0; i < numStudents; i++) {
+                const randomExam = allExams[i % numExams]; // Sử dụng toán tử % để lặp lại danh sách đề thi nếu cần
+                const studentId = new ObjectId(allStudents[i]._id).toString();
+                const examId = new ObjectId(randomExam._id).toString();
+                const data = {
+                    studentId: studentId,
+                    examId: examId
+                    // Các trường khác nếu cần
+                };
+                await createNew(data);
+            }
+        } else {
+            // Nhân bản đề thi để số đề trùng nhau ít nhất
+            const numCopies = Math.ceil(numStudents / numExams);
+            const clonedExams = [];
+            for (let i = 0; i < numCopies; i++) {
+                clonedExams.push(...allExams.map(exam => ({ ...exam })));
+            }
+            // Random gán đề thi cho sinh viên
+            for (let i = 0; i < numStudents; i++) {
+                const randomExam = clonedExams[Math.floor(Math.random() * clonedExams.length)];
+                const studentId = new ObjectId(allStudents[i]._id).toString();
+                const examId = new ObjectId(randomExam._id).toString();
+                const data = {
+                    studentId: studentId,
+                    examId: examId
+                    // Các trường khác nếu cần
+                };
+                await createNew(data);
+                // Loại bỏ đề thi đã gán
+                const index = clonedExams.findIndex(exam => exam._id === randomExam._id);
+                clonedExams.splice(index, 1);
+            }
+        }
+        console.log('Assigned random exams to students successfully');
+    } catch (error) {
+        console.error('Error assigning random exams to students:', error);
+        throw new Error('Error assigning random exams to students');
+    }
+};
+
+
+
 const findOneById = async (student_examId) => {
     try {
         const result = await GET_DB().collection(STUDENT_EXAM_COLLECTION_NAME).findOne({
@@ -242,5 +299,6 @@ export const student_examModel = {
     deleteOneById,
     findStudentExamsByExamId,
     updateStudentExamsWithNewQuestions,
-    calculateAndUpdateFinalScore
+    calculateAndUpdateFinalScore,
+    assignRandomExamToStudent
 }

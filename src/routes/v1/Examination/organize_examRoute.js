@@ -12,4 +12,9 @@ Router.route('/:id')
     .get(organize_examController.getDetails)
     .put(organize_examValidation.update, organize_examController.update)
     .delete(organize_examValidation.deleteItem, organize_examController.deleteItem)
+
+Router.route('/grade/:gradeId')
+    .get(organize_examController.getDetailByGradeId);
+
+Router.route('')
 export const organize_examRoute = Router

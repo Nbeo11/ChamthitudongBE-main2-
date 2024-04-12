@@ -5,6 +5,7 @@ import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { organize_examModel } from './Examination/organize_examModel'
 import { studentModel } from './studentModel'
 
 //Define Collection (Name & Schema)
@@ -92,6 +93,33 @@ const getDetails = async (id) => {
                     localField: '_id',
                     foreignField: 'gradeId',
                     as: 'students'
+                }
+            },
+            {
+                $lookup: {
+                    from: organize_examModel.ORGANIZE_EXAM_COLLECTION_NAME,
+                    let: { gradeId: '$_id' }, // Khai báo biến gradeId là _id của grade
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$$gradeId', '$details.gradeId'] // Sử dụng $in để kiểm tra gradeId có trong mảng details.gradeId không
+                                }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                details: {
+                                    $filter: {
+                                        input: '$details',
+                                        as: 'detail',
+                                        cond: { $eq: ['$$detail.gradeId', '$$gradeId'] } // Lọc chỉ lấy detail có gradeId cần tìm
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    as: 'organizeExams'
                 }
             }
         ]).toArray()

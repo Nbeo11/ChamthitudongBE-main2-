@@ -49,10 +49,21 @@ const deleteItem = async (req, res, next) => {
     }
 }
 
+const getDetailByGradeId = async (req, res, next) => {
+    try {
+        const gradeId = req.params.gradeId;
+        const detail = await organize_examService.getDetailByGradeId(gradeId);
+        res.status(StatusCodes.OK).json(detail);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const organize_examController = {
     createNew,
     getDetails,
     getAllOrganize_exams,
     update,
-    deleteItem
+    deleteItem,
+    getDetailByGradeId 
 }

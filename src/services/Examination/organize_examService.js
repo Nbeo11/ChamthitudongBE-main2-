@@ -75,9 +75,23 @@ const deleteItem = async (organize_examId) => {
     }
 }
 
+const getDetailByGradeId = async (gradeId) => {
+    try {
+        const detail = await organize_examModel.getDetailByGradeId(gradeId);
+        if (!detail) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'Details for the provided gradeId not found!');
+        }
+        return detail;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 export const organize_examService = {
     createNew,
     getDetails,
+    getDetailByGradeId,
     getAllOrganize_exams,
     update,
     deleteItem
