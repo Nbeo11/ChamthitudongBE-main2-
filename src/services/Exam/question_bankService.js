@@ -1,9 +1,11 @@
 /* eslint-disable indent */
 /* eslint-disable no-useless-catch */
 // eslint-disable-next-line quotes
-import { StatusCodes } from 'http-status-codes'
-import { question_bankModel } from '~/models/Exam/question_bankModel'
-import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes';
+import { ObjectId } from 'mongodb';
+import { question_bankModel } from '~/models/Exam/question_bankModel';
+import ApiError from '~/utils/ApiError';
+
 
 const createNew = async (reqBody) => {
     try {
@@ -20,13 +22,36 @@ const createNew = async (reqBody) => {
     }
 }
 
-const getAllQuestion_banks = async () => {
+const getAllQuestion_banks = async (moduleId, question_format, difficulty, chapters) => {
     try {
-        // Gọi phương thức từ Model để lấy tất cả các khóa học
-        const allQuestion_banks = await question_bankModel.getAllQuestion_banks()
-        return allQuestion_banks
-    } catch (error) { throw error }
+        // Tạo điều kiện truy vấn dựa trên các tham số lọc dữ liệu
+        const query = {};
+        if (moduleId) {
+            // Chuyển đổi moduleId sang ObjectId
+            query.moduleId = new ObjectId(moduleId);
+        }
+        if (question_format) {
+            query.question_format = question_format;
+        }
+        if (difficulty) {
+            query.difficulty = difficulty;
+        }
+        if (chapters && chapters.length > 0) {
+            // Lọc theo nhiều chapters trong mảng chapters
+            query['chapters.chapter'] = { $in: chapters };
+        }
+
+        // Gọi phương thức từ Model để lấy tất cả các câu hỏi với các điều kiện lọc
+        const allQuestion_banks = await question_bankModel.getAllQuestion_banks(query);
+
+        return allQuestion_banks;
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw error;
+    }
 }
+
+
 
 const getDetails = async (question_bankId) => {
     try {

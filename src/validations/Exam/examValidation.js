@@ -10,6 +10,7 @@ const createNew = async (req, res, next) => {
         organize_examId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         totalscore: Joi.number().required().min(1),
+        exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
         question: Joi.array().items(
             Joi.object({
                 question_bankId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -32,6 +33,7 @@ const update = async (req, res, next) => {
         organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         totalscore: Joi.number().min(1),
+        exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết'),
         question: Joi.array().items(
             Joi.object({
                 question_bankId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),

@@ -19,6 +19,16 @@ const getAllExam_structures = async (req, res, next) => {
     }
 }
 
+const getByModuleId = async (req, res, next) => {
+    try {
+        const moduleId = req.params.moduleId
+        const exam_structure = await exam_structureService.getByModuleId(moduleId);
+        res.status(StatusCodes.OK).json(exam_structure);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const getDetails = async (req, res, next) => {
     try {
         const exam_structureId = req.params.id
@@ -54,5 +64,6 @@ export const exam_structureController = {
     getDetails,
     getAllExam_structures,
     update,
-    deleteItem
+    deleteItem,
+    getByModuleId
 }

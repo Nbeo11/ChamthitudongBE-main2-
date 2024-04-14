@@ -12,12 +12,12 @@ const createNew = async (req, res, next) => {
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
         exam_structure: Joi.array().items(
             Joi.object({
-                section: Joi.string().required().min(1).max(50).trim().strict(),
-                question: Joi.string().required().min(1).max(100).trim().strict(),
                 score: Joi.number().required().min(1),
-                chapter: Joi.array().items(
-                    Joi.string().required().min(1).max(50).trim().strict()
-                ),
+                chapters: Joi.array().items(
+                    Joi.object({
+                        chapter: Joi.string()
+                    })
+                ).min(1).required(),
                 difficulty: Joi.string().trim().strict(),
             })
 
@@ -41,12 +41,12 @@ const update = async (req, res, next) => {
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết'),
         exam_structure: Joi.array().items(
             Joi.object({
-                section: Joi.string().min(1).max(50).trim().strict(),
-                question: Joi.string().min(1).max(100).trim().strict(),
                 score: Joi.number().min(1),
-                chapter: Joi.array().items(
-                    Joi.string().min(1).max(50).trim().strict()
-                ),
+                chapters: Joi.array().items(
+                    Joi.object({
+                        chapter: Joi.string()
+                    })
+                ).min(1),
                 difficulty: Joi.string().trim().strict(),
             })
 

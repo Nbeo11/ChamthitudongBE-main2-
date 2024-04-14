@@ -12,12 +12,26 @@ const createNew = async (req, res, next) => {
 
 const getAllQuestion_banks = async (req, res, next) => {
     try {
-        const allQuestion_banks = await question_bankService.getAllQuestion_banks();
+        const { moduleId, question_format, difficulty, chapter } = req.query;
+        let chaptersArray = [];
+
+        // Kiểm tra nếu chapter là một chuỗi và không rỗng
+        if (chapter && typeof chapter === 'string' && chapter.trim() !== '') {
+            // Phân tách chuỗi thành mảng các chapters
+            chaptersArray = chapter.split(',').map(ch => ch.trim());
+        }
+
+        // Gọi phương thức từ service để lấy tất cả các câu hỏi
+        // và sử dụng query params để lọc dữ liệu
+        const allQuestion_banks = await question_bankService.getAllQuestion_banks(moduleId, question_format, difficulty, chaptersArray);
+
         res.status(StatusCodes.OK).json(allQuestion_banks);
     } catch (error) {
         next(error);
     }
 }
+
+
 
 const getDetails = async (req, res, next) => {
     try {

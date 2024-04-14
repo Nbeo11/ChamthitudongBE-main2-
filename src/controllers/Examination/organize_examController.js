@@ -12,8 +12,19 @@ const createNew = async (req, res, next) => {
 
 const getAllOrganize_exams = async (req, res, next) => {
     try {
-        const allOrganize_exams = await organize_examService.getAllOrganize_exams();
+        const { moduleId } = req.query;
+        const allOrganize_exams = await organize_examService.getAllOrganize_exams(moduleId);
         res.status(StatusCodes.OK).json(allOrganize_exams);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const getByModuleId = async (req, res, next) => {
+    try {
+        const moduleId = req.params.moduleId; // Lấy moduleId từ request params
+        const organize_exam = await organize_examService.getByModuleId(moduleId); // Truyền courseId vào hàm
+        res.status(StatusCodes.OK).json(organize_exam);
     } catch (error) {
         next(error);
     }
@@ -65,5 +76,6 @@ export const organize_examController = {
     getAllOrganize_exams,
     update,
     deleteItem,
-    getDetailByGradeId 
+    getDetailByGradeId,
+    getByModuleId
 }

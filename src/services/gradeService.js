@@ -5,7 +5,6 @@ import { StatusCodes } from 'http-status-codes'
 import { gradeModel } from '~/models/gradeModel'
 import { ologyModel } from '~/models/ologyModel'
 import ApiError from '~/utils/ApiError'
-import { moduleService } from './Module/moduleService'
 
 const createNew = async (reqBody) => {
     try {
@@ -18,7 +17,7 @@ const createNew = async (reqBody) => {
         if (getNewGrade) {
             await ologyModel.pushGradeOrderIds(getNewGrade)
         }
-
+        
         return getNewGrade
     } catch (error) {
         throw error
@@ -48,14 +47,8 @@ const getDetails = async (gradeId) => {
         if (!grade) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Grade not found!')
         }
-        const moduleIds = grade.organizeExams.map(organizeExam => organizeExam.moduleId)
-        console.log(moduleIds)
-        for (const moduleId of moduleIds) {
-            const detail = await  moduleService.getDetails(moduleId)
-            console.log(detail)
-        }
 
-            return grade
+        return grade
     } catch (error) {
         throw error
     }
@@ -88,7 +81,7 @@ const deleteItem = async (gradeId) => {
 
         await ologyModel.pullGradeOrderIds(targetGrade)
 
-        return { deleteResult: 'The grade and its references have been deleted!' }
+        return { deleteResult: 'The grade and its references have been deleted!'}
     } catch (error) {
         throw error
     }

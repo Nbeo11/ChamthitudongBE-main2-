@@ -9,6 +9,10 @@ Router.route('/')
     .get(exam_structureController.getAllExam_structures)
     .post(exam_structureValidation.createNew, exam_structureController.createNew)
 
+
+Router.route('/module/:moduleId')
+    .get(exam_structureController.getByModuleId)
+
 Router.route('/:id')
     .get(exam_structureController.getDetails)
     .put(exam_structureValidation.update, exam_structureController.update)

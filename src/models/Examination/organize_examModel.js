@@ -61,10 +61,10 @@ const findOneById = async (organize_examId) => {
     } catch (error) { throw new Error(error) }
 }
 
-const getAllOrganize_exams = async () => {
+const getAllOrganize_exams = async (query) => {
     try {
         // Gọi phương thức từ MongoDB để lấy tất cả các khóa học
-        const allOrganize_exams = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).find().toArray();
+        const allOrganize_exams = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).find(query).toArray();
         // Trả về kết quả
         return allOrganize_exams;
     } catch (error) {
@@ -80,6 +80,18 @@ const getDetails = async (id) => {
         })
         return result
     } catch (error) { throw new Error(error) }
+}
+
+const getByModuleId = async (moduleId) => {
+    try {
+        // Lấy tất cả các ology thuộc course
+        const result = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).findOne({
+            moduleId: new ObjectId(moduleId)
+        });
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 const getDetailByGradeId = async (gradeId) => {
@@ -157,4 +169,5 @@ export const organize_examModel = {
     update,
     deleteOneById,
     deleteManyByOrganize_examId,
+    getByModuleId
 }

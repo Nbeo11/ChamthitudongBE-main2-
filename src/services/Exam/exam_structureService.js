@@ -41,6 +41,18 @@ const getDetails = async (exam_structureId) => {
     }
 }
 
+const getByModuleId = async (moduleId) => {
+    try {
+        // Lấy tất cả các student thuộc grade
+        const examtructure = await exam_structureModel.getByModuleId(moduleId)
+        return examtructure;
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw error;
+    }
+}
+
+
 const update = async (id, reqBody) => {
     try {
         const updateData = {
@@ -78,5 +90,6 @@ export const exam_structureService = {
     getDetails,
     getAllExam_structures,
     update,
-    deleteItem
+    deleteItem,
+    getByModuleId
 }

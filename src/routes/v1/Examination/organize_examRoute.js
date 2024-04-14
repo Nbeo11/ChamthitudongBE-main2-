@@ -13,6 +13,9 @@ Router.route('/:id')
     .put(organize_examValidation.update, organize_examController.update)
     .delete(organize_examValidation.deleteItem, organize_examController.deleteItem)
 
+Router.route('/:moduleId/organize_exams') // Thêm '/:courseId/organize_exams' để truyền courseId vào đây
+    .get(organize_examController.getByModuleId);
+
 Router.route('/grade/:gradeId')
     .get(organize_examController.getDetailByGradeId);
 

@@ -4,6 +4,9 @@
 import Joi from 'joi';
 import { ObjectId } from 'mongodb';
 import { GET_DB } from '~/config/mongodb';
+import { exam_structureService } from '~/services/Exam/exam_structureService';
+import { question_bankService } from '~/services/Exam/question_bankService';
+import { organize_examService } from '~/services/Examination/organize_examService';
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 
 //Define Collection (Name & Schema)
@@ -12,6 +15,7 @@ const EXAM_COLLECTION_SCHEMA = Joi.object({
     organize_examId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     totalscore: Joi.number().required().min(1),
+    exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
     question: Joi.array().items(
         Joi.object({
             question_bankId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -28,7 +32,23 @@ const EXAM_COLLECTION_SCHEMA = Joi.object({
 const INVALID_UPDATE_FIELDS = ['_id', 'moduleId', 'createdAt']
 
 const validateBeforeCreate = async (data) => {
-    return await EXAM_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+    try {
+        const validData = await EXAM_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false });
+
+        // Kiểm tra xem question_format có giống với exam_format không
+        await Promise.all(validData.question.map(async (questionItem) => {
+            const question = await GET_DB().collection('question_banks').findOne({
+                _id: new ObjectId(questionItem.question_bankId)
+            });
+            if (question.question_format !== validData.exam_format) {
+                throw new Error('question_format phải giống với exam_format');
+            }
+        }));
+
+        return validData;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 
@@ -52,6 +72,81 @@ const createNew = async (data) => {
         return createdExam
     } catch (error) { throw new Error(error) }
 }
+
+const createAutoExam = async (moduleId, numberOfExams = 1) => {
+    try {
+        const exams = [];
+
+        for (let i = 0; i < numberOfExams; i++) {
+            // Lấy organize_examId
+            const organize_exam = await organize_examService.getByModuleId(moduleId);
+            const organize_examId = organize_exam._id.toString(); 
+            console.log('organize_examId', organize_examId);
+
+            // Lấy cấu trúc bài thi dựa trên moduleId
+            const examStructure = await exam_structureService.getByModuleId(moduleId);
+            console.log('moduleId', moduleId);
+            console.log('examStructure', examStructure);
+
+            // Trích xuất dữ liệu cần thiết từ examStructure
+            const { exam_format, exam_structure: structure } = examStructure;
+            console.log('exam_format', exam_format);
+            console.log('exam_structure', structure);
+
+            // Initialize array to store generated questions
+            const generatedQuestions = [];
+
+            // Lặp qua cấu trúc bài thi
+            for (let j = 0; j < structure.length; j++) {
+                const { difficulty, chapters } = structure[j];
+                console.log(`Difficulty: ${difficulty}`);
+                for (const chapter of chapters) {
+                    console.log('Chapter:');
+                    console.log(chapter); // Log toàn bộ đối tượng chapter để xem cụ thể
+                }
+                const questions = await question_bankService.getAllQuestion_banks(
+                    moduleId,
+                    exam_format,
+                    difficulty,
+                    chapters.map(chapter => chapter.chapter)
+                );
+                
+                const randomIndex = Math.floor(Math.random() * questions.length);
+                generatedQuestions.push({
+                    ...questions[randomIndex],
+                    question_score: structure[j].score // Lấy điểm số từ exam_structure
+                });
+                console.log('generatedQuestions: ', generatedQuestions);
+            }
+            
+            // Calculate total score based on the number of questions
+            const totalScore = generatedQuestions.reduce((total, question) => total + question.question_score, 0);
+
+            // Create exam object
+            const autoExam = {
+                organize_examId: organize_examId,
+                moduleId: moduleId,
+                totalscore: totalScore,
+                exam_format,
+                question: generatedQuestions.map(({ _id, question_score }) => ({
+                    question_bankId: _id.toString(),
+                    question_score
+                })),
+                examstatus: 1 // Assuming the default exam status
+            };
+
+            // Create the exam
+            const createdExam = await createNew(autoExam);
+            exams.push(createdExam);
+        }
+
+        return exams;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+
 
 const findOneById = async (examId) => {
     try {
@@ -137,10 +232,11 @@ export const examModel = {
     EXAM_COLLECTION_NAME,
     EXAM_COLLECTION_SCHEMA,
     createNew,
+    createAutoExam,
     findOneById,
     getDetails,
     getAllExams,
     deleteManyByExamId,
     update,
-    deleteOneById
+    deleteOneById,
 }

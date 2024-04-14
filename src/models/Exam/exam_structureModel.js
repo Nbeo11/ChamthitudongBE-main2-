@@ -14,12 +14,12 @@ const EXAM_STRUCTURE_COLLECTION_SCHEMA = Joi.object({
     exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
     exam_structure: Joi.array().items(
         Joi.object({
-            section: Joi.string().required().min(1).max(50).trim().strict(),
-            question: Joi.string().required().min(1).max(100).trim().strict(),
             score: Joi.number().required().min(1),
-            chapter: Joi.array().items(
-                Joi.string().required().min(1).max(50).trim().strict()
-            ),
+            chapters: Joi.array().items(
+                Joi.object({
+                    chapter: Joi.string()
+                })
+            ).min(1).required(),
             difficulty: Joi.string().trim().strict(),
         })
     ),
@@ -61,6 +61,19 @@ const findOneById = async (exam_structureId) => {
         })
         return result
     } catch (error) { throw new Error(error) }
+}
+
+const getByModuleId = async (moduleId) => {
+    try {
+        // Lấy tất cả các student thuộc grade
+        const result = await GET_DB().collection(EXAM_STRUCTURE_COLLECTION_NAME).findOne({
+            moduleId: new ObjectId(moduleId)
+        })
+        return result;
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw error;
+    }
 }
 
 const getAllExam_structures = async () => {
@@ -132,5 +145,6 @@ export const exam_structureModel = {
     getAllExam_structures,
     deleteManyByExam_structureId,
     update,
-    deleteOneById
+    deleteOneById,
+    getByModuleId
 }

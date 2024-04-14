@@ -1,9 +1,11 @@
 /* eslint-disable indent */
 /* eslint-disable no-useless-catch */
 // eslint-disable-next-line quotes
-import { StatusCodes } from 'http-status-codes'
-import { organize_examModel } from '~/models/Examination/organize_examModel'
-import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes';
+import { ObjectId } from 'mongodb';
+import { organize_examModel } from '~/models/Examination/organize_examModel';
+import ApiError from '~/utils/ApiError';
+
 
 const createNew = async (reqBody) => {
     try {
@@ -20,12 +22,27 @@ const createNew = async (reqBody) => {
     }
 }
 
-const getAllOrganize_exams = async () => {
+const getAllOrganize_exams = async (moduleId) => {
     try {
+        const query = {};
+        if (moduleId) {
+            // Chuyển đổi moduleId sang ObjectId
+            query.moduleId = new ObjectId(moduleId);
+        }
         // Gọi phương thức từ Model để lấy tất cả các khóa học
-        const allOrganize_exams = await organize_examModel.getAllOrganize_exams()
+        const allOrganize_exams = await organize_examModel.getAllOrganize_exams(query)
         return allOrganize_exams
     } catch (error) { throw error }
+}
+
+const getByModuleId = async (moduleId) => {
+    try {
+        // Gọi phương thức từ Model để lấy tất cả các ngành học của khóa học có _id là moduleId
+        const organize_exam = await organize_examModel.getByModuleId(moduleId)
+        return organize_exam
+    } catch (error) {
+        throw error
+    }
 }
 
 const getDetails = async (organize_examId) => {
@@ -94,5 +111,6 @@ export const organize_examService = {
     getDetailByGradeId,
     getAllOrganize_exams,
     update,
-    deleteItem
+    deleteItem,
+    getByModuleId
 }

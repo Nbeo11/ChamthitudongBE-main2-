@@ -10,29 +10,64 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 const QUESTION_BANK_COLLECTION_NAME = 'question_banks'
 const QUESTION_BANK_COLLECTION_SCHEMA = Joi.object({
     moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    chapter: Joi.string().required().min(1).max(50).trim().strict(),
+    chapters: Joi.array().items(
+        Joi.object({
+            chapter: Joi.string()
+        })
+    ).min(1).required(),
     question_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
     difficulty: Joi.string().required().trim().strict(),
     question_detail: Joi.string().required().min(1).trim().strict(),
-    inputs: Joi.array().items(
-        Joi.object({
-            input: Joi.string(),
-            testcase: Joi.string().required().min(1).max(50).trim().strict(),
-            score_percentage: Joi.number().required().min(0).max(100),
-        })
-    ).min(1).required(),
+    inputs: Joi.alternatives().conditional('question_format', {
+        is: 'Thực hành',
+        then: Joi.array().items(
+            Joi.object({
+                input: Joi.string(),
+                testcase: Joi.string().required().min(1).max(50).trim().strict(),
+                score_percentage: Joi.number().required().min(0).max(100),
+            })
+        ).min(1).required(),
+        otherwise: Joi.array().items(
+            Joi.object({
+                input: Joi.string().required(),
+            })
+        ).min(1).required(),
+    }),
+    key: Joi.when('question_format', {
+        is: 'Trắc nghiệm',
+        then: Joi.array().items(Joi.string()).min(1).required(),
+        otherwise: Joi.forbidden(),
+    }),
     question_bankstatus: Joi.number().valid(1, 2, 3).default(1),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
 });
 
-
-const INVALID_UPDATE_FIELDS = ['_id', 'moduleId', 'createdAt']
+const INVALID_UPDATE_FIELDS = ['_id', 'moduleId', 'question_format', 'createdAt']
 
 const validateBeforeCreate = async (data) => {
-    return await QUESTION_BANK_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
+    try {
+        const validData = await QUESTION_BANK_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false });
+        
+        if (validData.question_format === 'Trắc nghiệm') {
+            // Kiểm tra xem có đáp án đúng không, nếu không có, báo lỗi
+            
+            // Kiểm tra các phần tử trong mảng key phải có trong mảng inputs
+            validData.key.forEach(keyItem => {
+                if (!validData.inputs.some(input => input.input === keyItem)) {
+                    throw new Error('Mỗi phần tử trong mảng key phải tồn tại trong mảng inputs');
+                }
+            });
+        }
+        
+        return validData;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
+
+
 
 
 const createNew = async (data) => {
@@ -60,17 +95,18 @@ const findOneById = async (question_bankId) => {
     } catch (error) { throw new Error(error) }
 }
 
-const getAllQuestion_banks = async () => {
+const getAllQuestion_banks = async (query) => {
     try {
-        // Gọi phương thức từ MongoDB để lấy tất cả các khóa học
-        const allQuestion_banks = await GET_DB().collection(QUESTION_BANK_COLLECTION_NAME).find().toArray();
-        // Trả về kết quả
+        // Gọi phương thức từ MongoDB để lấy tất cả các câu hỏi với các điều kiện lọc
+        const allQuestion_banks = await GET_DB().collection(QUESTION_BANK_COLLECTION_NAME).find(query).toArray();
+
         return allQuestion_banks;
     } catch (error) {
         // Xử lý lỗi nếu có
         throw error;
     }
 }
+
 
 const getDetails = async (id) => {
     try {
