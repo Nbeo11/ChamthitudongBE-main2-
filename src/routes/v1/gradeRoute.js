@@ -12,6 +12,9 @@ Router.route('/')
 Router.route('/:ologyId/grades')
     .get(gradeController.getAllByOlogyId);
 
+Router.route('/courseandology/:courseId/:ologyId')
+    .get(gradeController.getAllByCourseAndOlogyId);
+
 Router.route('/:id')
     .get(gradeController.getDetails)
     .put(gradeValidation.update, gradeController.update)

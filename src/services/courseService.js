@@ -2,10 +2,7 @@
 /* eslint-disable no-useless-catch */
 // eslint-disable-next-line quotes
 import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
 import { courseModel } from '~/models/courseModel'
-import { gradeModel } from '~/models/gradeModel'
-import { ologyModel } from '~/models/ologyModel'
 import ApiError from '~/utils/ApiError'
 
 const createNew = async (reqBody) => {
@@ -37,7 +34,6 @@ const getAllCourses = async () => {
     try {
         // Gọi phương thức từ Model để lấy tất cả các khóa học
         const allCourses = await courseModel.getAllCourses();
-        
         // Trả về kết quả
         return allCourses;
     } catch (error) {
@@ -53,32 +49,7 @@ const getDetails = async (courseId) => {
         if (!course) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found!')
         }
-
-        //B1: deepclone course là tạo ra một cái mới để xử lý, không ảnh hưởng tớ course ban đầu
-        const resCourse = cloneDeep(course)
-
-        //B2: Đưa grade về đúng ology
-        resCourse.ologies.forEach(ology => {
-            //Cách dùng .equals này là bởi vì ObjectId trong MongoDB có suppport method .equals
-            ology.grades = resCourse.grades.filter(grade => grade.ologyId.equals(ology._id))
-            
-            //Cách này là convert ObjectId về string bằng hàm toString() của Javascript
-            // ology.grades = resCourse.grades.filter(grade => grade.ologyId.toString() === ology._id.toString())
-        })
-        resCourse.grades.forEach(grade => {
-            //Cách dùng .equals này là bởi vì ObjectId trong MongoDB có suppport method .equals
-            grade.students = resCourse.students.filter(student => student.gradeId.equals(grade._id))
-            
-            //Cách này là convert ObjectId về string bằng hàm toString() của Javascript
-            // ology.grades = resCourse.grades.filter(grade => grade.ologyId.toString() === ology._id.toString())
-        })
-
-        //B3: Xóa mảng grades khỏi course ban đầu
-        delete resCourse.grades
-        delete resCourse.students
-
-
-        return resCourse
+        return course
     } catch (error) {
         throw error
     }
@@ -101,7 +72,7 @@ const deleteItem = async (courseId) => {
     try {
         // Xóa course
         await courseModel.deleteOneById(courseId);
-
+        /*
         // Xóa toàn bộ ology và grade thuộc course
         const ologies = await ologyModel.getAllByCourseId(courseId);
         for (const ology of ologies) {
@@ -113,7 +84,7 @@ const deleteItem = async (courseId) => {
 
         // Sau khi xóa tất cả các grade, bạn có thể xóa tất cả các ology thuộc course
         await ologyModel.deleteManyByOlogyId(courseId);
-
+        */
         return { deleteResult: 'The course and its references have been deleted!' };
     } catch (error) {
         throw error;

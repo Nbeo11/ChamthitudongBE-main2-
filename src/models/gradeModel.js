@@ -6,6 +6,8 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { organize_examModel } from './Examination/organize_examModel'
+import { courseModel } from './courseModel'
+import { ologyModel } from './ologyModel'
 import { studentModel } from './studentModel'
 
 //Define Collection (Name & Schema)
@@ -18,7 +20,7 @@ const GRADE_COLLECTION_SCHEMA = Joi.object({
     ).default([]),
     gradecode: Joi.string().required().min(1).max(50).trim().strict(),
     gradename: Joi.string().required().min(1).max(50).trim().strict(),
-    gradedescription: Joi.string().required().min(1).max(50).trim().strict(),
+    gradedescription: Joi.string().min(0).max(50).trim().strict(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
@@ -66,15 +68,44 @@ const getAllByOlogyId = async (ologyId) => {
     }
 }
 
+const getCourseNameByCourseId = async (courseId) => {
+    try {
+        const course = await courseModel.findOneById(courseId);
+        return course ? course.coursename : null; // Trả về tên course nếu tồn tại, ngược lại trả về null
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+const getOlogyNameByOlogyId = async (ologyId) => {
+    try {
+        const ology = await ologyModel.findOneById(ologyId);
+        return ology ? ology.ologyname : null; // Trả về tên ology nếu tồn tại, ngược lại trả về null
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 const getAllGrade = async () => {
     try {
-        // Lấy tất cả các grade thuộc ology
-        const result = await GET_DB().collection(GRADE_COLLECTION_NAME).find().toArray();
-        // Trả về kết quả
-        return result;
+        // Lấy tất cả các grade
+        const grades = await GET_DB().collection(GRADE_COLLECTION_NAME).find().toArray();
+
+        // Duyệt qua từng grade để lấy thông tin về course và thêm vào
+        const gradesWithCourseInfo = await Promise.all(grades.map(async (grade) => {
+            // Lấy tên của course từ courseId
+            const courseName = await getCourseNameByCourseId(grade.courseId);
+            const ologyName = await getOlogyNameByOlogyId(grade.ologyId)
+            return {
+                ...grade,
+                courseName: courseName,
+                ologyName: ologyName
+            };
+        }));
+
+        return gradesWithCourseInfo;
     } catch (error) {
-        // Xử lý lỗi nếu có
-        throw error;
+        throw new Error(error);
     }
 }
 
@@ -117,6 +148,9 @@ const getDetails = async (id) => {
                                     }
                                 }
                             }
+                        },
+                        {
+                            $sort: { 'details.exam_start': 1 } // Sắp xếp theo thời gian tăng dần
                         }
                     ],
                     as: 'organizeExams'
@@ -130,9 +164,9 @@ const getDetails = async (id) => {
 const pushStudentOrderIds = async (student) => {
     try {
         const result = await GET_DB().collection(GRADE_COLLECTION_NAME).findOneAndUpdate(
-        { _id: new ObjectId(student.gradeId) },
-        { $push: { studentOrderIds: new ObjectId(student._id) } },
-        { returnDocument: 'after' }
+            { _id: new ObjectId(student.gradeId) },
+            { $push: { studentOrderIds: new ObjectId(student._id) } },
+            { returnDocument: 'after' }
         )
 
         return result
@@ -160,7 +194,7 @@ const update = async (gradeId, updateData) => {
         })
         const result = await GET_DB().collection(GRADE_COLLECTION_NAME).findOneAndUpdate(
             { _id: new ObjectId(gradeId) },
-            { $set: updateData},
+            { $set: updateData },
             { returnDocument: 'after' }
         );
 

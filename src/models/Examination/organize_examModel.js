@@ -100,7 +100,6 @@ const getDetailByGradeId = async (gradeId) => {
         
         // Lặp qua từng bản ghi organize_exam để tìm thông tin của gradeId
         const detailsArray = allOrganize_exams.reduce((acc, curr) => acc.concat(curr.details), []);
-
         // Tìm thông tin của gradeId trong mảng details
         const detail = detailsArray.find(detail => detail.gradeId === gradeId);
 

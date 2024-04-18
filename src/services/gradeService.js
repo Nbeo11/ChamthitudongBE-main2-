@@ -32,6 +32,16 @@ const getAllByOlogyId = async (ologyId) => {
     } catch (error) { throw error }
 }
 
+const getAllByCourseAndOlogyId = async (courseId, ologyId) => {
+    try {
+        const result = await gradeModel.findOneByQuestionAndExamId(courseId, ologyId);
+        return result;
+
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 const getAllGrade = async () => {
     try {
         // Gọi phương thức từ Model để lấy tất cả các khóa học
@@ -93,5 +103,6 @@ export const gradeService = {
     getAllByOlogyId,
     update,
     deleteItem,
-    getAllGrade
+    getAllGrade,
+    getAllByCourseAndOlogyId
 }

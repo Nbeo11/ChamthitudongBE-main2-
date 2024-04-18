@@ -35,58 +35,58 @@ Router.get('/status', (req, res) => {
     res.status(StatusCodes.OK).json({ message: 'APIs V1 are ready to use.' })
 })
 
-/**Student APIs */
+/**Student APIs *///
 Router.use('/students', studentRoute)
 
-/**Board APIs */
+/**Board APIs *///
 Router.use('/courses', courseRoute)
 
-/**Ology APIs */
+/**Ology APIs *///
 Router.use('/ologies', ologyRoute)
 
-/**Grade APIs */
+/**Grade APIs *///
 Router.use('/grades', gradeRoute)
 
-/**Faculty APIs */
+/**Faculty APIs *///
 Router.use('/faculties', facultyRoute)
 
-/**Department APIs */
+/**Department APIs *///
 Router.use('/departments', departmentRoute)
 
-/**Teacher APIs */
+/**Teacher APIs *///
 Router.use('/teachers', teacherRoute)
 
-/**User APIs */
+/**User APIs *///
 Router.use('/users', userRoute)
 
-/**Authentication APIs */
+/**Authentication APIs *///
 Router.use('/auth', authRoute);
 
-/**tranning_department APIs */
+/**tranning_department APIs *///
 Router.use('/tranning_departments', tranning_departmentRoute);
 
-/**testing_department APIs */
+/**testing_department APIs *///
 Router.use('/testing_departments', testing_departmentRoute);
 
-/**department_leader APIs */
+/**department_leader APIs *///
 Router.use('/department_leaders', department_leaderRoute);
 
-/**difficult APIs */
+/**difficult APIs *///
 Router.use('/difficults', difficultRoute);
 
-/**modules APIs */
+/**modules APIs *///
 Router.use('/modules', moduleRoute);
 
-/**teaching-group APIs */
+/**teaching-group APIs *///
 Router.use('/teaching_groups', teaching_groupRoute);
 
-/**exam_structure APIs */
+/**exam_structure APIs *///
 Router.use('/exam_structures', exam_structureRoute);
 
-/**question_bank APIs */
+/**question_bank APIs *///
 Router.use('/question_banks', question_bankRoute);
 
-/**exam APIs */
+/**exam APIs *///
 Router.use('/exams', examRoute);
 
 /**compile APIs */

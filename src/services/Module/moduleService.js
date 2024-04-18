@@ -38,6 +38,19 @@ const getDetails = async (moduleId) => {
     }
 }
 
+const update = async (id, reqBody) => {
+    try {
+        const updateData = {
+            ...reqBody,
+            updatedAt: Date.now()
+        }
+        const updatedModule = await moduleModel.update(id, updateData);
+        return updatedModule
+    } catch (error) {
+        throw error
+    }
+}
+
 const updateModuleAndChapters = async (moduleId, updateData) => {
     try {
         const updatedModule = await moduleModel.updateModuleAndChapters(moduleId, updateData);
@@ -68,5 +81,6 @@ export const moduleService = {
     getDetails,
     getAllModules,
     updateModuleAndChapters,
-    deleteItem
+    deleteItem,
+    update
 }

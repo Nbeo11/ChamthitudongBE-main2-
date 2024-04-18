@@ -6,10 +6,8 @@ import { ologyValidation } from '~/validations/ologyValidation'
 const Router = express.Router()
 
 Router.route('/')
+    .get(ologyController.getAllOlogies)
     .post(ologyValidation.createNew, ologyController.createNew)
-
-Router.route('/:courseId/ologies') // Thêm '/:courseId/ologies' để truyền courseId vào đây
-    .get(ologyController.getAllByCourseId);
 
 Router.route('/:id')
     .get(ologyController.getDetails)

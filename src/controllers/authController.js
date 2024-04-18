@@ -3,6 +3,7 @@
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
 import { GET_DB } from '~/config/mongodb';
+import { studentService } from '~/services/studentService';
 const getUserByEmail = async (email) => {
     try {
         const user = await GET_DB().collection('users').findOne({ email });
@@ -20,15 +21,26 @@ export const loginUser = async (req, res) => {
 
         // Kiểm tra xem người dùng có tồn tại không và so sánh mật khẩu
         if (user && await bcrypt.compare(password, user.password)) {
-            res.json({ success: true, message: 'Đăng nhập thành công', user });
+            console.log(user.user_id);
+            if (user.role == 'sinhvien') {
+                // Nếu role là 'sinhvien', lấy thông tin chi tiết của sinh viên
+                const studentDetails = await studentService.getDetails(user.user_id);
+                // Xử lý thông tin sinh viên ở đây (ví dụ: gửi về client)
+                // Ví dụ: res.json({ success: true, message: 'Đăng nhập thành công', user, studentDetails });
+                return res.json({ success: true, message: 'Đăng nhập thành công', user, studentDetails });
+            } else {
+                // Nếu role không phải là 'sinhvien'
+                return res.json({ success: true, message: 'Đăng nhập thành công', user });
+            }
         } else {
-            res.status(401).json({ success: false, message: 'Tên đăng nhập hoặc mật khẩu không đúng' });
+            return res.status(401).json({ success: false, message: 'Tên đăng nhập hoặc mật khẩu không đúng' });
         }
     } catch (error) {
         console.error('Đã xảy ra lỗi khi đăng nhập:', error);
-        res.status(500).json({ success: false, message: 'Đã xảy ra lỗi khi đăng nhập' });
+        return res.status(500).json({ success: false, message: 'Đã xảy ra lỗi khi đăng nhập' });
     }
 };
+
 
 export const updatePassword = async (req, res) => {
     try {

@@ -20,6 +20,19 @@ const getAllByOlogyId = async (req, res, next) => {
     }
 }
 
+const getAllByCourseAndOlogyId = async (req, res, next) => {
+    try {
+        const courseId = req.params.courseId;
+        const ologyId = req.params.ologyId;
+        const result = await gradeService.findOneByQuestionAndExamId(courseId, ologyId);
+        res.status(StatusCodes.OK).json(result);
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 const getAllGrade = async (req, res, next) => {
     try {
         const allGrades = await gradeService.getAllGrade(); // Truyền courseId vào hàm
@@ -66,5 +79,6 @@ export const gradeController = {
     getAllByOlogyId,
     getAllGrade,
     update,
-    deleteItem
+    deleteItem,
+    getAllByCourseAndOlogyId
 }

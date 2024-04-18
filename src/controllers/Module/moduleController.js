@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { StatusCodes } from 'http-status-codes'
 import { moduleService } from '~/services/Module/moduleService'
 
@@ -28,6 +29,17 @@ const getDetails = async (req, res, next) => {
 const update = async (req, res, next) => {
     try {
         const moduleId = req.params.id;
+        const updatedModule = await moduleService.update(moduleId, req.body);
+
+        res.status(StatusCodes.OK).json(updatedModule);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const updateModuleAndChapters = async (req, res, next) => {
+    try {
+        const moduleId = req.params.id;
         const updatedModule = await moduleService.updateModuleAndChapters(moduleId, req.body);
 
         res.status(StatusCodes.OK).json(updatedModule);
@@ -51,6 +63,7 @@ export const moduleController = {
     createNew,
     getDetails,
     getAllModules,
-    update,
-    deleteItem
+    updateModuleAndChapters,
+    deleteItem,
+    update
 }

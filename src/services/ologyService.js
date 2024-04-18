@@ -2,9 +2,6 @@
 /* eslint-disable no-useless-catch */
 // eslint-disable-next-line quotes
 import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
-import { courseModel } from '~/models/courseModel'
-import { gradeModel } from '~/models/gradeModel'
 import { ologyModel } from '~/models/ologyModel'
 import ApiError from '~/utils/ApiError'
 
@@ -16,30 +13,19 @@ const createNew = async (reqBody) => {
         const createdOlogy = await ologyModel.createNew(newOlogy)
         const getNewOlogy = await ologyModel.findOneById(createdOlogy.insertedId)
 
-        if (getNewOlogy) {
-            // Xử lý cấu trúc data ở đây trước khi trả dữ liệu về
-            getNewOlogy.grades = []
-
-            //Cập nhật mảng ologyOrderIds trong collection courses
-            await courseModel.pushOlogyOrderIds(getNewOlogy)
-        }
-
         return getNewOlogy
     } catch (error) {
         throw error
     }
 }
 
-const getAllByCourseId = async (courseId) => {
+const getAllOlogies = async () => {
     try {
-        // Gọi phương thức từ Model để lấy tất cả các ngành học của khóa học có _id là courseId
-        const allOlogies = await ologyModel.getAllByCourseId(courseId)
+        // Gọi phương thức từ Model để lấy tất cả các khóa học
+        const allOlogies = await ologyModel.getAllOlogies()
         return allOlogies
-    } catch (error) {
-        throw error
-    }
+    } catch (error) { throw error }
 }
-
 
 const getDetails = async (ologyId) => {
     try {
@@ -48,18 +34,7 @@ const getDetails = async (ologyId) => {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Ology not found!');
         }
 
-        const resOlogy = cloneDeep(ology);
-
-        // Check if resOlogy.grades is defined before iterating over it
-        if (resOlogy.grades) {
-            resOlogy.grades.forEach(grade => {
-                grade.students = resOlogy.students.filter(student => student.gradeId.equals(grade._id));
-            });
-        }
-
-        delete resOlogy.students;
-
-        return resOlogy;
+        return ology;
     } catch (error) {
         throw error;
     }
@@ -85,8 +60,10 @@ const deleteItem = async (ologyId) => {
         if (!targetOlogy) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Ology not found!')
         }
+        
         // Xóa ology
         await ologyModel.deleteOneById(ologyId)
+        /*
         // Xóa toàn bộ grade thuộc ology
 
         await gradeModel.deleteManyByGradeId(ologyId)
@@ -94,7 +71,7 @@ const deleteItem = async (ologyId) => {
         // Xóa ologyId trong mảng ologyOrderIds trong Course chứa nó
 
         await courseModel.pullOlogyOrderIds(targetOlogy)
-
+        */
         return { deleteResult: 'The ology and its references have been deleted!' }
     } catch (error) {
         throw error
@@ -104,7 +81,7 @@ const deleteItem = async (ologyId) => {
 export const ologyService = {
     createNew,
     getDetails,
-    getAllByCourseId,
     update,
-    deleteItem
+    deleteItem,
+    getAllOlogies
 }

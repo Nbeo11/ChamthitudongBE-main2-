@@ -7,7 +7,6 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        courseId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         ologycode: Joi.string().required().min(1).max(50).trim().strict(),
         ologyname: Joi.string().required().min(1).max(50).trim().strict(),
         ologyshort: Joi.string().required().min(1).max(50).trim().strict(),

@@ -14,7 +14,7 @@ const createNew = async (req, res, next) => {
         numofpractice: Joi.string().pattern(/^[0-9]{1,2}$/),
         numoftask: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofexam: Joi.string().pattern(/^[0-9]{1,2}$/),
-        note: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(0).max(50).trim().strict(),
         moduledescription: Joi.string().min(1).max(50).trim().strict(),
         chapters: Joi.array().items(
             Joi.object({
@@ -43,7 +43,7 @@ const update = async (req, res, next) => {
         numofpractice: Joi.string().pattern(/^[0-9]{1,2}$/),
         numoftask: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofexam: Joi.string().pattern(/^[0-9]{1,2}$/),
-        note: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(0).max(50).trim().strict(),
         moduledescription: Joi.string().min(1).max(50).trim().strict(),
         chapters: Joi.array().items(
             Joi.object({
