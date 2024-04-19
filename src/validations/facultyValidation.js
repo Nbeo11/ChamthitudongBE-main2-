@@ -7,7 +7,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        facultyname: Joi.string().required().min(1).max(50).trim().strict()
+        facultyname: Joi.string().required().min(1).max(5000).trim().strict()
     })
 
     try {
@@ -26,7 +26,7 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
     //Lưu ý không dùng hàm require trong trường hợp update
     const correctCondition = Joi.object({
-        facultyname: Joi.string().min(1).max(50).trim().strict()
+        facultyname: Joi.string().min(1).max(5000).trim().strict()
     })
 
     try {

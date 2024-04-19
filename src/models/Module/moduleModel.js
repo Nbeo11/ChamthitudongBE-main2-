@@ -8,22 +8,22 @@ import { GET_DB } from '~/config/mongodb'
 //Define Collection (Name & Schema)
 const MODULE_COLLECTION_NAME = 'modules'
 const MODULE_COLLECTION_SCHEMA = Joi.object({
-    modulecode: Joi.string().required().min(1).max(50).trim().strict(),
-    modulename: Joi.string().required().min(1).max(50).trim().strict(),
+    modulecode: Joi.string().required().min(1).max(5000).trim().strict(),
+    modulename: Joi.string().required().min(1).max(5000).trim().strict(),
     numofcredit: Joi.string().required().pattern(/^[0-9]{1,2}$/),
     compulsory: Joi.boolean().required(),
     numoftheory: Joi.string().pattern(/^[0-9]{1,2}$/),
     numofpractice: Joi.string().pattern(/^[0-9]{1,2}$/),
     numoftask: Joi.string().pattern(/^[0-9]{1,2}$/),
     numofexam: Joi.string().pattern(/^[0-9]{1,2}$/),
-    moduledescription: Joi.string().min(1).max(50).trim().strict(),
+    moduledescription: Joi.string().min(1).max(5000).trim().strict(),
     chapters: Joi.array().items(
         Joi.object({
-            chaptername: Joi.string().min(1).max(50).trim().strict(),
+            chaptername: Joi.string().min(1).max(5000).trim().strict(),
             description: Joi.string().min(1).max(255).trim().strict()
         })
     ),
-    note: Joi.string().min(0).max(50).trim().strict(),
+    note: Joi.string().min(0).max(5000).trim().strict(),
     modulestatus: Joi.number().valid(1, 2, 3).default(1),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),

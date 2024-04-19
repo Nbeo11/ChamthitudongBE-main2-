@@ -7,7 +7,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        moduleId: Joi.string().required().min(1).max(50).trim().strict(),
+        moduleId: Joi.string().required().min(1).max(5000).trim().strict(),
         exam_time: Joi.string().required().pattern(/^[0-9]{1,3}$/),
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết').required(),
         exam_structure: Joi.array().items(
@@ -22,7 +22,7 @@ const createNew = async (req, res, next) => {
             })
 
         ),
-        note: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(1).max(5000).trim().strict(),
         exam_structurestatus: Joi.number().valid(1, 2, 3).default(1),
     })
 
@@ -36,7 +36,7 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        moduleId: Joi.string().min(1).max(50).trim().strict(),
+        moduleId: Joi.string().min(1).max(5000).trim().strict(),
         exam_time: Joi.string().pattern(/^[0-9]{1,3}$/),
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết'),
         exam_structure: Joi.array().items(
@@ -51,7 +51,7 @@ const update = async (req, res, next) => {
             })
 
         ),
-        note: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(1).max(5000).trim().strict(),
         exam_structurestatus: Joi.number().valid(1, 2, 3).default(1),
     })
 

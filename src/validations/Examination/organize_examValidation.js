@@ -17,7 +17,7 @@ const createNew = async (req, res, next) => {
             exam_date: Joi.date().required().iso(),
             exam_start: Joi.date().required(), // Lưu cả ngày và thời gian bắt đầu
             exam_end: Joi.date().required(),
-            room: Joi.string().required().min(1).max(50).trim().strict()
+            room: Joi.string().required().min(1).max(5000).trim().strict()
         })
     ).min(1).required(),
     })
@@ -42,7 +42,7 @@ const update = async (req, res, next) => {
             exam_date: Joi.date().iso(),
             exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
             exam_end: Joi.date(),
-            room: Joi.string().min(1).max(50).trim().strict()
+            room: Joi.string().min(1).max(5000).trim().strict()
         })
     ).min(1),
     })

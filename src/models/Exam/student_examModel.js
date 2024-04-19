@@ -21,7 +21,7 @@ const STUDENT_EXAM_COLLECTION_SCHEMA = Joi.object({
     exam_date: Joi.date().iso(),
     exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
     exam_end: Joi.date(),
-    room: Joi.string().min(1).max(50).trim().strict(),
+    room: Joi.string().min(1).max(5000).trim().strict(),
     question: Joi.array().items(
         Joi.object({
             question_bankId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),

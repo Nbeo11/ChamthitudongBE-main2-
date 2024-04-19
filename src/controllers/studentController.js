@@ -11,6 +11,15 @@ const createNew = async (req, res, next) => {
     } catch (error) { next(error) }
 }
 
+const getAllStudents = async (req, res, next) => {
+    try {
+        const allStudents = await studentService.getAllStudents();
+        res.status(StatusCodes.OK).json(allStudents);
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 const getAllByGradeId = async (req, res, next) => {
     try {
@@ -77,5 +86,6 @@ export const studentController = {
     getAllByGradeId,
     update,
     deleteItem,
-    addStudentsFromExcel
+    addStudentsFromExcel,
+    getAllStudents
 }

@@ -10,8 +10,8 @@ const createNew = async (req, res, next) => {
         inputs: Joi.array().items(
             Joi.object({
                 input: Joi.string(),
-                testcase: Joi.string().required().min(1).max(50).trim().strict(),
-                score_percentage:Joi.string().required().min(1).max(50).trim().strict()
+                testcase: Joi.string().required().min(1).max(5000).trim().strict(),
+                score_percentage:Joi.string().required().min(1).max(5000).trim().strict()
             })
         ).min(1).required() // Tối thiểu một input
     });
@@ -30,8 +30,8 @@ const update = async (req, res, next) => {
         inputs: Joi.array().items(
             Joi.object({
                 input: Joi.string(),
-                testcase: Joi.string().min(1).max(50).trim().strict(),
-                score_percentage: Joi.string().min(1).max(50).trim().strict()
+                testcase: Joi.string().min(1).max(5000).trim().strict(),
+                score_percentage: Joi.string().min(1).max(5000).trim().strict()
             })
         ).min(1) // Tối thiểu một input
     });

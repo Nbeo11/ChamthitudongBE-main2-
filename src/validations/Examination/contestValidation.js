@@ -7,9 +7,9 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        scholastic: Joi.string().required().min(1).max(50).trim().strict(),
-        semester: Joi.string().required().min(1).max(50).trim().strict(),
-        contest_name: Joi.string().required().min(1).max(50).trim().strict(),
+        scholastic: Joi.string().required().min(1).max(5000).trim().strict(),
+        semester: Joi.string().required().min(1).max(5000).trim().strict(),
+        contest_name: Joi.string().required().min(1).max(5000).trim().strict(),
         start_time: Joi.date().required().iso(), // định dạng DD/MM/YYYY
         end_time: Joi.date().required().iso(),
 
@@ -25,9 +25,9 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        scholastic: Joi.string().min(1).max(50).trim().strict(),
-        semester: Joi.string().min(1).max(50).trim().strict(),
-        contest_name: Joi.string().min(1).max(50).trim().strict(),
+        scholastic: Joi.string().min(1).max(5000).trim().strict(),
+        semester: Joi.string().min(1).max(5000).trim().strict(),
+        contest_name: Joi.string().min(1).max(5000).trim().strict(),
         start_time: Joi.date().iso(), // định dạng DD/MM/YYYY
         end_time: Joi.date().iso(),
 

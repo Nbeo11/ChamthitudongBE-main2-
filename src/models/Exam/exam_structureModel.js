@@ -23,7 +23,7 @@ const EXAM_STRUCTURE_COLLECTION_SCHEMA = Joi.object({
             difficulty: Joi.string().trim().strict(),
         })
     ),
-    note: Joi.string().min(1).max(50).trim().strict(),
+    note: Joi.string().min(1).max(5000).trim().strict(),
     exam_structurestatus: Joi.number().valid(1, 2, 3).default(1),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),

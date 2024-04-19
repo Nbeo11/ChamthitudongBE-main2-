@@ -49,10 +49,35 @@ const deleteItem = async (req, res, next) => {
     }
 }
 
+const getTeachingGroupsByLecturer = async (req, res) => {
+    try {
+        const lecturerId = req.params.lecturerId; // Giả sử bạn truyền giảng viên Id qua URL params
+        const teachingGroups = await teaching_groupService.getTeachingGroupsByLecturer(lecturerId);
+        res.json(teachingGroups);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+const findOneByModuleId = async (req, res, next) => {
+    try {
+        const moduleId = req.params.moduleId; // Lấy question_bankId từ request params
+        const result = await teaching_groupService.findOneByModuleId(moduleId);
+        res.status(StatusCodes.OK).json(result);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 export const teaching_groupController = {
     createNew,
     getDetails,
     getAllTeaching_groups,
     update,
-    deleteItem
+    deleteItem,
+    getTeachingGroupsByLecturer,
+    findOneByModuleId
 }

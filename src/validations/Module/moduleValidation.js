@@ -6,19 +6,19 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        modulecode: Joi.string().required().min(1).max(50).trim().strict(),
-        modulename: Joi.string().required().min(1).max(50).trim().strict(),
+        modulecode: Joi.string().required().min(1).max(5000).trim().strict(),
+        modulename: Joi.string().required().min(1).max(5000).trim().strict(),
         numofcredit: Joi.string().required().pattern(/^[0-9]{1,2}$/),
         compulsory: Joi.boolean().required(),
         numoftheory: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofpractice: Joi.string().pattern(/^[0-9]{1,2}$/),
         numoftask: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofexam: Joi.string().pattern(/^[0-9]{1,2}$/),
-        note: Joi.string().min(0).max(50).trim().strict(),
-        moduledescription: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(0).max(5000).trim().strict(),
+        moduledescription: Joi.string().min(1).max(5000).trim().strict(),
         chapters: Joi.array().items(
             Joi.object({
-                chaptername: Joi.string().min(1).max(50).trim().strict(),
+                chaptername: Joi.string().min(1).max(5000).trim().strict(),
                 description: Joi.string().min(1).max(255).trim().strict()
             })
         ),
@@ -35,19 +35,19 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        modulecode: Joi.string().min(1).max(50).trim().strict(),
-        modulename: Joi.string().min(1).max(50).trim().strict(),
+        modulecode: Joi.string().min(1).max(5000).trim().strict(),
+        modulename: Joi.string().min(1).max(5000).trim().strict(),
         numofcredit: Joi.string().pattern(/^[0-9]{1,2}$/),
         compulsory: Joi.boolean(),
         numoftheory: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofpractice: Joi.string().pattern(/^[0-9]{1,2}$/),
         numoftask: Joi.string().pattern(/^[0-9]{1,2}$/),
         numofexam: Joi.string().pattern(/^[0-9]{1,2}$/),
-        note: Joi.string().min(0).max(50).trim().strict(),
-        moduledescription: Joi.string().min(1).max(50).trim().strict(),
+        note: Joi.string().min(0).max(5000).trim().strict(),
+        moduledescription: Joi.string().min(1).max(5000).trim().strict(),
         chapters: Joi.array().items(
             Joi.object({
-                chaptername: Joi.string().min(1).max(50).trim().strict(),
+                chaptername: Joi.string().min(1).max(5000).trim().strict(),
                 description: Joi.string().min(1).max(255).trim().strict()
             })
         ),

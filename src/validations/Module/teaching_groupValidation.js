@@ -8,10 +8,17 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
         moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        lecturerinchargeId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        mainlecturerId: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
-        assistantlecturerId: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([])
-
+        lecturerincharge: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        mainlecturer: Joi.array().items(
+            Joi.object({
+                lecturerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+            })
+        ).min(1),
+        assistantlecturer: Joi.array().items(
+            Joi.object({
+                lecturerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+            })
+        ).min(1),
     })
 
     try {
@@ -25,9 +32,17 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
         moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        lecturerinchargeId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        mainlecturerId: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
-        assistantlecturerId: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([])
+        lecturerincharge: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        mainlecturerId: Joi.array().items(
+            Joi.object({
+                lecturer: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+            })
+        ).min(1),
+        assistantlecturer: Joi.array().items(
+            Joi.object({
+                lecturerId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+            })
+        ).min(1),
 
     })
 

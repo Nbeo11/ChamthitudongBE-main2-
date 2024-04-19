@@ -8,6 +8,7 @@ const Router = express.Router()
 const upload = multer({ dest: 'uploads/' });
 
 Router.route('/')
+    .get(studentController.getAllStudents)
     .post(studentValidation.createNew, studentController.createNew)
 
 Router.route('/:gradeId/students')

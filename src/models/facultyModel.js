@@ -11,7 +11,7 @@ import { teacherModel } from './teacherModel'
 //Define Collection (Name & Schema)
 const FACULTY_COLLECTION_NAME = 'faculties'
 const FACULTY_COLLECTION_SCHEMA = Joi.object({
-    facultyname: Joi.string().required().min(1).max(50).trim().strict(),
+    facultyname: Joi.string().required().min(1).max(5000).trim().strict(),
     // Lưu ý các item trong mảng columnOrderIds là ObjectId nên cần thêm pattern cho chuẩn
     departmentOrderIds: Joi.array().items(
         Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)

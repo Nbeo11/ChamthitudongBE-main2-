@@ -7,8 +7,8 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        username: Joi.string().required().min(1).max(50).trim().strict(),
-        password: Joi.string().required().min(1).max(50).trim().strict(),
+        username: Joi.string().required().min(1).max(5000).trim().strict(),
+        password: Joi.string().required().min(1).max(5000).trim().strict(),
         birth: Joi.date().iso(),
         gender: Joi.string().valid('male', 'female', 'other'),
         phoneNumber: Joi.string().pattern(/^[0-9]{10,11}$/),
@@ -25,7 +25,7 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        //username: Joi.string().min(1).max(50).trim().strict(),
+        //username: Joi.string().min(1).max(5000).trim().strict(),
         birth: Joi.date().iso(),
         gender: Joi.string().valid('male', 'female', 'other'),
         phoneNumber: Joi.string().pattern(/^[0-9]{10,11}$/),

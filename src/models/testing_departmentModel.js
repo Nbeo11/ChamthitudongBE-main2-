@@ -10,8 +10,8 @@ import createUsersCollection from './userModel'
 //Define Collection (Name & Schema)
 const TESTING_DEPARTMENT_COLLECTION_NAME = 'testing_departments'
 const TESTING_DEPARTMENT_COLLECTION_SCHEMA = Joi.object({
-    username: Joi.string().required().min(1).max(50).trim().strict(),
-    password: Joi.string().required().min(1).max(50).trim().strict(),
+    username: Joi.string().required().min(1).max(5000).trim().strict(),
+    password: Joi.string().required().min(1).max(5000).trim().strict(),
     birth: Joi.date().iso(),
     gender: Joi.string().valid('male', 'female', 'other'),
     phoneNumber: Joi.string().pattern(/^[0-9]{10,11}$/),

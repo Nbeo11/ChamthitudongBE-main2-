@@ -10,8 +10,8 @@ const EXERCISE_COLLECTION_SCHEMA = Joi.object({
     inputs: Joi.array().items(
         Joi.object({
             input: Joi.string(),
-            testcase: Joi.string().required().min(1).max(50).trim().strict(),
-            score_percentage: Joi.string().required().min(1).max(50).trim().strict()
+            testcase: Joi.string().required().min(1).max(5000).trim().strict(),
+            score_percentage: Joi.string().required().min(1).max(5000).trim().strict()
         })
     ).min(1).required(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),

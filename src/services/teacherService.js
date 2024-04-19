@@ -2,7 +2,6 @@
 /* eslint-disable no-useless-catch */
 // eslint-disable-next-line quotes
 import { StatusCodes } from 'http-status-codes'
-import { departmentModel } from '~/models/departmentModel'
 import { teacherModel } from '~/models/teacherModel'
 import ApiError from '~/utils/ApiError'
 
@@ -13,10 +12,6 @@ const createNew = async (reqBody) => {
         }
         const createdTeacher = await teacherModel.createNew(newTeacher)
         const getNewTeacher = await teacherModel.findOneById(createdTeacher.insertedId)
-
-        if (getNewTeacher) {
-            await departmentModel.pushTeacherOrderIds(getNewTeacher)
-        }
         
         return getNewTeacher
     } catch (error) {
@@ -69,8 +64,6 @@ const deleteItem = async (teacherId) => {
     
 
         // Xóa teacherId trong mảng teacherOrderIds trong Faculty chứa nó
-
-        await departmentModel.pullTeacherOrderIds(targetTeacher)
 
         return { deleteResult: 'The teacher and its references have been deleted!'}
     } catch (error) {

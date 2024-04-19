@@ -24,7 +24,7 @@ const getAllByCourseAndOlogyId = async (req, res, next) => {
     try {
         const courseId = req.params.courseId;
         const ologyId = req.params.ologyId;
-        const result = await gradeService.findOneByQuestionAndExamId(courseId, ologyId);
+        const result = await gradeService.getAllByCourseAndOlogyId(courseId, ologyId);
         res.status(StatusCodes.OK).json(result);
         
     } catch (error) {

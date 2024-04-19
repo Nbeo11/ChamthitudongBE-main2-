@@ -11,7 +11,7 @@ import { teacherModel } from './teacherModel'
 const DEPARTMENT_COLLECTION_NAME = 'departments'
 const DEPARTMENT_COLLECTION_SCHEMA = Joi.object({
     facultyId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    departmentname: Joi.string().required().min(1).max(50).trim().strict(),
+    departmentname: Joi.string().required().min(1).max(5000).trim().strict(),
     teacherOrderIds: Joi.array().items(
         Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     ).default([]),

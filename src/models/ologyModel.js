@@ -8,10 +8,10 @@ import { GET_DB } from '~/config/mongodb'
 //Define Collection (Name & Schema)
 const OLOGY_COLLECTION_NAME = 'ologies'
 const OLOGY_COLLECTION_SCHEMA = Joi.object({
-    ologycode: Joi.string().required().min(1).max(50).trim().strict(),
-    ologyname: Joi.string().required().min(1).max(50).trim().strict(),
-    ologyshort: Joi.string().required().min(1).max(50).trim().strict(),
-    ologydescription: Joi.string().required().min(1).max(50).trim().strict(),
+    ologycode: Joi.string().required().min(1).max(5000).trim().strict(),
+    ologyname: Joi.string().required().min(1).max(5000).trim().strict(),
+    ologyshort: Joi.string().required().min(1).max(5000).trim().strict(),
+    ologydescription: Joi.string().required().min(1).max(5000).trim().strict(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)

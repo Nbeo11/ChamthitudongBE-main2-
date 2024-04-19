@@ -9,9 +9,9 @@ const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
         courseId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         ologyId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        gradecode: Joi.string().required().min(1).max(50).trim().strict(),
-        gradename: Joi.string().required().min(1).max(50).trim().strict(),
-        gradedescription: Joi.string().min(0).max(50).trim().strict(),
+        gradecode: Joi.string().required().min(1).max(5000).trim().strict(),
+        gradename: Joi.string().required().min(1).max(5000).trim().strict(),
+        gradedescription: Joi.string().min(0).max(5000).trim().strict(),
     })
 
     try {
@@ -25,9 +25,9 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        gradecode: Joi.string().min(1).max(50).trim().strict(),
-        gradename: Joi.string().min(1).max(50).trim().strict(),
-        gradedescription: Joi.string().min(0).max(50).trim().strict(),
+        gradecode: Joi.string().min(1).max(5000).trim().strict(),
+        gradename: Joi.string().min(1).max(5000).trim().strict(),
+        gradedescription: Joi.string().min(0).max(5000).trim().strict(),
     })
 
     try {

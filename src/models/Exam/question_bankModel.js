@@ -23,7 +23,7 @@ const QUESTION_BANK_COLLECTION_SCHEMA = Joi.object({
         then: Joi.array().items(
             Joi.object({
                 input: Joi.string(),
-                testcase: Joi.string().required().min(1).max(50).trim().strict(),
+                testcase: Joi.string().required().min(1).max(5000).trim().strict(),
                 score_percentage: Joi.number().required().min(0).max(100),
             })
         ).min(1).required(),

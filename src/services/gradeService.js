@@ -34,7 +34,7 @@ const getAllByOlogyId = async (ologyId) => {
 
 const getAllByCourseAndOlogyId = async (courseId, ologyId) => {
     try {
-        const result = await gradeModel.findOneByQuestionAndExamId(courseId, ologyId);
+        const result = await gradeModel.getAllByCourseAndOlogyId(courseId, ologyId);
         return result;
 
     } catch (error) {

@@ -13,8 +13,8 @@ const createNewStudentCode = async (req, res, next) => {
         output: Joi.array().items(
             Joi.object({
                 input: Joi.string(),
-                executionOutput: Joi.string().required().min(1).max(50).trim().strict(),
-                expectedOutput: Joi.string().required().min(1).max(50).trim().strict(),
+                executionOutput: Joi.string().required().min(1).max(5000).trim().strict(),
+                expectedOutput: Joi.string().required().min(1).max(5000).trim().strict(),
                 executionError: Joi.string().allow(''),
                 check: Joi.boolean().default(false),
                 score: Joi.number().required().min(0),
@@ -22,7 +22,7 @@ const createNewStudentCode = async (req, res, next) => {
         ).min(1),
         startedAt: Joi.date().timestamp('javascript'),
         completedAt: Joi.date().timestamp('javascript'),
-        executionTime:  Joi.string().min(0).max(50).trim().strict(),
+        executionTime:  Joi.string().min(0).max(5000).trim().strict(),
 
     });
 
@@ -43,8 +43,8 @@ const updateStudentCode = async (req, res, next) => {
         output: Joi.array().items(
             Joi.object({
                 input: Joi.string(),
-                executionOutput: Joi.string().min(1).max(50).trim().strict(),
-                expectedOutput: Joi.string().min(1).max(50).trim().strict(),
+                executionOutput: Joi.string().min(1).max(5000).trim().strict(),
+                expectedOutput: Joi.string().min(1).max(5000).trim().strict(),
                 executionError: Joi.string().allow(''),
                 check: Joi.boolean().default(false),
                 score: Joi.number().required().min(0),
@@ -52,7 +52,7 @@ const updateStudentCode = async (req, res, next) => {
         ).min(1),
         startedAt: Joi.date().timestamp('javascript'),
         completedAt: Joi.date().timestamp('javascript'),
-        executionTime:  Joi.string().min(0).max(50).trim().strict(),
+        executionTime:  Joi.string().min(0).max(5000).trim().strict(),
 
     });
 

@@ -8,9 +8,9 @@ import { GET_DB } from '~/config/mongodb';
 //Define Collection (Name & Schema)
 const CONTEST_COLLECTION_NAME = 'contests'
 const CONTEST_COLLECTION_SCHEMA = Joi.object({
-    scholastic: Joi.string().required().min(1).max(50).trim().strict(),
-    semester: Joi.string().required().min(1).max(50).trim().strict(),
-    contest_name: Joi.string().required().min(1).max(50).trim().strict(),
+    scholastic: Joi.string().required().min(1).max(5000).trim().strict(),
+    semester: Joi.string().required().min(1).max(5000).trim().strict(),
+    contest_name: Joi.string().required().min(1).max(5000).trim().strict(),
     start_time: Joi.date().required().iso(), // định dạng DD/MM/YYYY
     end_time: Joi.date().required().iso(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),

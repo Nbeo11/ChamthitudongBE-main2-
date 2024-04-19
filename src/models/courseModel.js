@@ -10,8 +10,8 @@ import { studentModel } from './studentModel'
 //Define Collection (Name & Schema)
 const COURSE_COLLECTION_NAME = 'courses'
 const COURSE_COLLECTION_SCHEMA = Joi.object({
-    coursename: Joi.string().required().min(1).max(50).trim().strict(),
-    coursedetail: Joi.string().required().min(1).max(50).trim().strict(),
+    coursename: Joi.string().required().min(1).max(5000).trim().strict(),
+    coursedetail: Joi.string().required().min(1).max(5000).trim().strict(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)

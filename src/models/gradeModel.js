@@ -18,9 +18,9 @@ const GRADE_COLLECTION_SCHEMA = Joi.object({
     studentOrderIds: Joi.array().items(
         Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     ).default([]),
-    gradecode: Joi.string().required().min(1).max(50).trim().strict(),
-    gradename: Joi.string().required().min(1).max(50).trim().strict(),
-    gradedescription: Joi.string().min(0).max(50).trim().strict(),
+    gradecode: Joi.string().required().min(1).max(5000).trim().strict(),
+    gradename: Joi.string().required().min(1).max(5000).trim().strict(),
+    gradedescription: Joi.string().min(0).max(5000).trim().strict(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
@@ -67,6 +67,19 @@ const getAllByOlogyId = async (ologyId) => {
         throw error;
     }
 }
+
+const getAllByCourseAndOlogyId = async (courseId, ologyId) => {
+    try {
+        const result = await GET_DB().collection(GRADE_COLLECTION_NAME).find({
+            courseId: new ObjectId(courseId),
+            ologyId: new ObjectId(ologyId)
+        }).toArray();
+
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 const getCourseNameByCourseId = async (courseId) => {
     try {
@@ -237,5 +250,6 @@ export const gradeModel = {
     pushStudentOrderIds,
     update,
     deleteOneById,
-    pullStudentOrderIds
+    pullStudentOrderIds,
+    getAllByCourseAndOlogyId
 }

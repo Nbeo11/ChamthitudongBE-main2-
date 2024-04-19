@@ -15,8 +15,8 @@ const STUDENT_CODE_COLLECTION_SCHEMA = Joi.object({
     output: Joi.array().items(
         Joi.object({
             input: Joi.string(),
-            executionOutput: Joi.string().required().min(1).max(50).trim().strict(),
-            expectedOutput: Joi.string().required().min(1).max(50).trim().strict(),
+            executionOutput: Joi.string().required().min(1).max(5000).trim().strict(),
+            expectedOutput: Joi.string().required().min(1).max(5000).trim().strict(),
             executionError: Joi.string().allow(''),
             check:Joi.boolean().default(false),
             score: Joi.number().required().min(0),
@@ -25,7 +25,7 @@ const STUDENT_CODE_COLLECTION_SCHEMA = Joi.object({
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     startedAt: Joi.date().timestamp('javascript'),
     completedAt: Joi.date().timestamp('javascript'),
-    executionTime:  Joi.string().min(0).max(50).trim().strict(),
+    executionTime:  Joi.string().min(0).max(5000).trim().strict(),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
 });
@@ -121,6 +121,7 @@ const findOneByQuestionAndExamId = async (student_examId, question_bankId) => {
         throw new Error(error);
     }
 };
+
 // Export student code model
 export const studentcodeModel = {
     STUDENT_CODE_COLLECTION_NAME,

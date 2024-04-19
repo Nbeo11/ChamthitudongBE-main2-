@@ -27,6 +27,16 @@ const getAllTeaching_groups = async () => {
     } catch (error) { throw error }
 }
 
+const findOneByModuleId = async (moduleId) => {
+    try {
+        const result = await teaching_groupModel.findOneByModuleId(moduleId)
+        
+        return result
+    } catch (error) {
+        throw error
+    }
+}
+
 const getDetails = async (teaching_groupId) => {
     try {
         const teaching_group = await teaching_groupModel.getDetails(teaching_groupId)
@@ -69,10 +79,44 @@ const deleteItem = async (teaching_groupId) => {
     }
 }
 
+const getTeachingGroupsByLecturer = async (lecturerId) => {
+    try {
+        // Tìm các môn học mà giảng viên đó là giảng viên phụ trách hoặc giảng viên dạy chính hoặc giảng viên trợ giảng
+        const teachingGroups = await teaching_groupModel.find({
+            $or: [
+                { lecturerinchargeId: lecturerId },
+                { mainlecturerId: { $in: [lecturerId] } },
+                { assistantlecturerId: { $in: [lecturerId] } }
+            ]
+        }).exec();
+
+        // Trả về danh sách các môn học và vai trò của giảng viên trong mỗi môn
+        return teachingGroups.map(teachingGroup => {
+            let role = '';
+            if (teachingGroup.lecturerinchargeId === lecturerId) {
+                role = 'Phụ trách';
+            } else if (teachingGroup.mainlecturerId.includes(lecturerId)) {
+                role = 'Giảng viên chính';
+            } else if (teachingGroup.assistantlecturerId.includes(lecturerId)) {
+                role = 'Trợ giảng';
+            }
+
+            return {
+                moduleId: teachingGroup.moduleId,
+                role: role
+            };
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const teaching_groupService = {
     createNew,
     getDetails,
     getAllTeaching_groups,
     update,
-    deleteItem
-}
+    deleteItem,
+    getTeachingGroupsByLecturer,
+    findOneByModuleId
+};
