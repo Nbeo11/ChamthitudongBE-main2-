@@ -13,7 +13,7 @@ Router.route('/lecturer/:lecturerId')
     .get(teaching_groupController.getTeachingGroupsByLecturer)
 
 Router.route('/module/:moduleId')
-    .get(teaching_groupController.findOneByModuleId)
+    .get(teaching_groupController.getByModuleId)
 
 Router.route('/:id')
     .get(teaching_groupController.getDetails)

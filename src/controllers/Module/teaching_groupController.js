@@ -60,10 +60,10 @@ const getTeachingGroupsByLecturer = async (req, res) => {
     }
 }
 
-const findOneByModuleId = async (req, res, next) => {
+const getByModuleId = async (req, res, next) => {
     try {
         const moduleId = req.params.moduleId; // Lấy question_bankId từ request params
-        const result = await teaching_groupService.findOneByModuleId(moduleId);
+        const result = await teaching_groupService.getByModuleId(moduleId);
         res.status(StatusCodes.OK).json(result);
 
     } catch (error) {
@@ -79,5 +79,5 @@ export const teaching_groupController = {
     update,
     deleteItem,
     getTeachingGroupsByLecturer,
-    findOneByModuleId
+    getByModuleId
 }

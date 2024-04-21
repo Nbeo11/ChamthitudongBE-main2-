@@ -7,6 +7,7 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 // Trong file teacherModel.js
+import { moduleModel } from './Module/moduleModel'
 import { userModel } from './userModel'
 
 //Define Collection (Name & Schema)
@@ -20,7 +21,7 @@ const TEACHER_COLLECTION_SCHEMA = Joi.object({
     birth: Joi.date().iso(),
     gender: Joi.string().valid('male', 'female', 'other'),
     phoneNumber: Joi.string().pattern(/^[0-9]{10,11}$/),
-    role: Joi.string().default('giangvien'), // Đặt giá trị mặc định là "giangvien"
+    role: Joi.string().default('giangvien'), // Đặt giá trị mặc định là 'giangvien'
     note: Joi.string().min(0).max(5000).trim().strict(),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -104,12 +105,61 @@ const getAllTeachers = async () => {
 
 const getDetails = async (id) => {
     try {
-        const result = await GET_DB().collection(TEACHER_COLLECTION_NAME).findOne({
-            _id: new ObjectId(id)
-        })
-        return result
-    } catch (error) { throw new Error(error) }
+        const teacher = await GET_DB().collection(TEACHER_COLLECTION_NAME).findOne({
+            _id: new ObjectId(id),
+            _destroy: false
+        });
+
+        if (!teacher) return {}; // Return empty object if teacher not found
+
+        const teachingGroups = await GET_DB().collection('teaching_groups').aggregate([
+            {
+                $match: {
+                    $or: [
+                        { 'lecturerincharge': teacher._id },
+                        { 'mainlecturer.lecturerId': teacher._id },
+                        { 'assistantlecturer.lecturerId': teacher._id }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: moduleModel.MODULE_COLLECTION_NAME,
+                    localField: 'moduleId',
+                    foreignField: '_id',
+                    as: 'module'
+                }
+            },
+            {
+                $addFields: {
+                    'moduleName': { $arrayElemAt: ['$module.modulename', 0] }
+                }
+            },
+            {
+                $project: {
+                    moduleId: 1,
+                    moduleName: 1,
+                    role: {
+                        $switch: {
+                            branches: [
+                                { case: { $eq: ['$lecturerincharge', teacher._id] }, then: 'Phụ trách' },
+                                { case: { $in: [teacher._id, '$mainlecturer.lecturerId'] }, then: 'Dạy chính' },
+                                { case: { $in: [teacher._id, '$assistantlecturer.lecturerId'] }, then: 'Trợ giảng' }
+                            ],
+                            default: null
+                        }
+                    }
+                }
+            }
+        ]).toArray();
+
+        return { teacher, teachingGroups };
+    } catch (error) {
+        throw new Error(error);
+    }
 }
+
+
 
 const deleteManyByTeacherId = async (departmentId) => {
     try {

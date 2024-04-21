@@ -22,7 +22,7 @@ const createNew = async (req, res, next) => {
                 description: Joi.string().min(1).max(255).trim().strict()
             })
         ),
-        modulestatus: Joi.number().valid(1, 2, 3).default(1)
+        modulestatus: Joi.number().valid(0, 1, 2, 3).default(0)
     })
 
     try {
@@ -51,7 +51,7 @@ const update = async (req, res, next) => {
                 description: Joi.string().min(1).max(255).trim().strict()
             })
         ),
-        modulestatus: Joi.number().valid(1, 2, 3).default(1)
+        modulestatus: Joi.number()
     })
 
     try {

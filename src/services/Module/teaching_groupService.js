@@ -13,7 +13,7 @@ const createNew = async (reqBody) => {
         }
         const createdTeaching_group = await teaching_groupModel.createNew(newTeaching_group)
         const getNewTeaching_group = await teaching_groupModel.findOneById(createdTeaching_group.insertedId)
-        
+
         return getNewTeaching_group
     } catch (error) {
         throw error
@@ -27,10 +27,9 @@ const getAllTeaching_groups = async () => {
     } catch (error) { throw error }
 }
 
-const findOneByModuleId = async (moduleId) => {
+const getByModuleId = async (moduleId) => {
     try {
-        const result = await teaching_groupModel.findOneByModuleId(moduleId)
-        
+        const result = await teaching_groupModel.getByModuleId(moduleId)
         return result
     } catch (error) {
         throw error
@@ -73,43 +72,24 @@ const deleteItem = async (teaching_groupId) => {
         await teaching_groupModel.deleteOneById(teaching_groupId)
         // Xóa toàn bộ student thuộc teaching_group
 
-        return { deleteResult: 'The teaching_group and its references have been deleted!'}
+        return { deleteResult: 'The teaching_group and its references have been deleted!' }
     } catch (error) {
         throw error
     }
 }
 
+// Trong teaching_groupService.js
 const getTeachingGroupsByLecturer = async (lecturerId) => {
     try {
         // Tìm các môn học mà giảng viên đó là giảng viên phụ trách hoặc giảng viên dạy chính hoặc giảng viên trợ giảng
-        const teachingGroups = await teaching_groupModel.find({
-            $or: [
-                { lecturerinchargeId: lecturerId },
-                { mainlecturerId: { $in: [lecturerId] } },
-                { assistantlecturerId: { $in: [lecturerId] } }
-            ]
-        }).exec();
+        const teachingGroups = await teaching_groupModel.getTeachingGroupsByLecturer(lecturerId);
 
-        // Trả về danh sách các môn học và vai trò của giảng viên trong mỗi môn
-        return teachingGroups.map(teachingGroup => {
-            let role = '';
-            if (teachingGroup.lecturerinchargeId === lecturerId) {
-                role = 'Phụ trách';
-            } else if (teachingGroup.mainlecturerId.includes(lecturerId)) {
-                role = 'Giảng viên chính';
-            } else if (teachingGroup.assistantlecturerId.includes(lecturerId)) {
-                role = 'Trợ giảng';
-            }
-
-            return {
-                moduleId: teachingGroup.moduleId,
-                role: role
-            };
-        });
+        // Trả về kết quả
+        return teachingGroups;
     } catch (error) {
         throw error;
     }
-};
+}
 
 export const teaching_groupService = {
     createNew,
@@ -117,6 +97,6 @@ export const teaching_groupService = {
     getAllTeaching_groups,
     update,
     deleteItem,
-    getTeachingGroupsByLecturer,
-    findOneByModuleId
+    getByModuleId,
+    getTeachingGroupsByLecturer, // Thêm hàm mới vào service
 };

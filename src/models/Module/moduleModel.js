@@ -24,7 +24,7 @@ const MODULE_COLLECTION_SCHEMA = Joi.object({
         })
     ),
     note: Joi.string().min(0).max(5000).trim().strict(),
-    modulestatus: Joi.number().valid(1, 2, 3).default(1),
+    modulestatus: Joi.number().valid(0, 1, 2, 3).default(0),
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)

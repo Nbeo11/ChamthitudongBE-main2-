@@ -40,7 +40,15 @@ const createNew = async (data) => {
         const validData = await validateBeforeCreate(data);
 
         const newTeaching_groupToAdd = {
-            ...validData
+            ...validData,
+            moduleId: new ObjectId(validData.moduleId),
+            lecturerincharge: new ObjectId(validData.lecturerincharge),
+            mainlecturer: validData.mainlecturer.map(item => ({
+                lecturerId: new ObjectId(item.lecturerId) // Chuyển đổi question_bankId sang ObjectId
+            })),
+            assistantlecturer: validData.assistantlecturer.map(item => ({
+                lecturerId: new ObjectId(item.lecturerId) // Chuyển đổi question_bankId sang ObjectId
+            }))
         }
 
         const createdTeaching_group = await GET_DB().collection(TEACHING_GROUP_COLLECTION_NAME).insertOne(newTeaching_groupToAdd);
@@ -60,12 +68,45 @@ const findOneById = async (teaching_groupId) => {
     } catch (error) { throw new Error(error) }
 }
 
-const findOneByModuleId = async (moduleId) => {
+const getByModuleId = async (moduleId) => {
     try {
-        const result = await GET_DB().collection(TEACHING_GROUP_COLLECTION_NAME).findOne({
-            _id: new ObjectId(moduleId)
-        })
-        return result
+        const result = await GET_DB().collection(TEACHING_GROUP_COLLECTION_NAME).find({
+            moduleId: new ObjectId(moduleId)
+        }).toArray();
+        const teaching_groupsInfo = await Promise.all(result.map(async (teaching_group) => {
+            // Lấy tên của course từ courseId
+            const moduleCode = await getModuleCodeByModuleId(teaching_group.moduleId);
+            const moduleName = await getModuleNameByModuleId(teaching_group.moduleId);
+            const lecturerInChargeName = await getLecturerNameByLecturerId(teaching_group.lecturerincharge);
+
+            const mainLecturersWithNames = await Promise.all(teaching_group.mainlecturer.map(async (lecturer) => {
+                const lecturerName = await getLecturerNameByLecturerId(lecturer.lecturerId);
+                return {
+                    ...lecturer,
+                    lecturerName: lecturerName
+                };
+            }));
+
+            // Thêm tên của giảng viên vào từng ID trong assistantlecturer
+            const assistantLecturersWithNames = await Promise.all(teaching_group.assistantlecturer.map(async (lecturer) => {
+                const lecturerName = await getLecturerNameByLecturerId(lecturer.lecturerId);
+                return {
+                    ...lecturer,
+                    lecturerName: lecturerName
+                };
+            }));
+
+            return {
+                ...teaching_group,
+                lecturerInChargeName: lecturerInChargeName,
+                moduleCode: moduleCode,
+                moduleName: moduleName,
+                mainlecturer: mainLecturersWithNames,
+                assistantlecturer: assistantLecturersWithNames
+            };
+        }));
+
+        return teaching_groupsInfo;
     } catch (error) { throw new Error(error) }
 }
 
@@ -192,6 +233,22 @@ const deleteOneById = async (teaching_groupId) => {
 }
 
 
+// Trong teaching_groupModel.js
+const getTeachingGroupsByLecturer = async (lecturerId) => {
+    try {
+        const teachingGroups = await GET_DB().collection(TEACHING_GROUP_COLLECTION_NAME).find({
+            $or: [
+                { 'lecturerincharge': lecturerId },
+                { 'mainlecturer.lecturerId': lecturerId },
+                { 'assistantlecturer.lecturerId': lecturerId }
+            ]
+        }).toArray();
+        return teachingGroups;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const teaching_groupModel = {
     TEACHING_GROUP_COLLECTION_NAME,
     TEACHING_GROUP_COLLECTION_SCHEMA,
@@ -202,5 +259,6 @@ export const teaching_groupModel = {
     deleteManyByTeaching_groupId,
     update,
     deleteOneById,
-    findOneByModuleId
+    getByModuleId,
+    getTeachingGroupsByLecturer, // Thêm hàm mới vào model
 }
