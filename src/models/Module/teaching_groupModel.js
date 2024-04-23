@@ -249,6 +249,20 @@ const getTeachingGroupsByLecturer = async (lecturerId) => {
     }
 }
 
+const deleteByModuleId = async (moduleId) => {
+    try {
+        const result = await GET_DB().collection(TEACHING_GROUP_COLLECTION_NAME).deleteMany({
+            moduleId: new ObjectId(moduleId)
+        });
+        console.log('deleteByModuleId - teaching_group', result);
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+
+
 export const teaching_groupModel = {
     TEACHING_GROUP_COLLECTION_NAME,
     TEACHING_GROUP_COLLECTION_SCHEMA,
@@ -260,5 +274,6 @@ export const teaching_groupModel = {
     update,
     deleteOneById,
     getByModuleId,
-    getTeachingGroupsByLecturer, // Thêm hàm mới vào model
+    getTeachingGroupsByLecturer,
+    deleteByModuleId
 }

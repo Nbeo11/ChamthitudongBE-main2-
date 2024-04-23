@@ -1,7 +1,9 @@
 /* eslint-disable indent */
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
+import { exam_structureModel } from '~/models/Exam/exam_structureModel'
 import { moduleModel } from '~/models/Module/moduleModel'
+import { teaching_groupModel } from '~/models/Module/teaching_groupModel'
 import ApiError from '~/utils/ApiError'
 
 const createNew = async (reqBody) => {
@@ -10,6 +12,12 @@ const createNew = async (reqBody) => {
             ...reqBody
         }
         const createdModule = await moduleModel.createNew(newModule)
+        const moduleId = createdModule.insertedId
+        const newExamStructure = {
+            moduleId: moduleId.toString(), // Sử dụng moduleId của module vừa tạo
+            // Thêm các trường dữ liệu khác của exam_structure tại đây nếu cần
+        }
+        await exam_structureModel.createNew(newExamStructure)
         const getNewModule = await moduleModel.findOneById(createdModule.insertedId)
         
         return getNewModule
@@ -68,8 +76,8 @@ const deleteItem = async (moduleId) => {
         }
         // Xóa module
         await moduleModel.deleteOneById(moduleId)
-        // Xóa toàn bộ student thuộc module
-
+        await teaching_groupModel.deleteByModuleId(moduleId)
+        await exam_structureModel.deleteByModuleId(moduleId)
         return { deleteResult: 'The module and its references have been deleted!'}
     } catch (error) {
         throw error
