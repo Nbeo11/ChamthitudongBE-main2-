@@ -7,7 +7,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        moduleId: Joi.string().required().min(1).max(5000).trim().strict(),
+        moduleId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         exam_time: Joi.string().pattern(/^[0-9]{1,3}$/),
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết'),
         exam_structure: Joi.array().items(
@@ -36,7 +36,6 @@ const createNew = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        moduleId: Joi.string().min(1).max(5000).trim().strict(),
         exam_time: Joi.string().pattern(/^[0-9]{1,3}$/),
         exam_format: Joi.string().valid('Trắc nghiệm', 'Thực hành', 'Lý thuyết'),
         exam_structure: Joi.array().items(

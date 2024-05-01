@@ -15,6 +15,7 @@ const createNew = async (req, res, next) => {
             ologyId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             gradeId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             exam_date: Joi.date().required().iso(),
+            shift: Joi.number().integer(),
             exam_start: Joi.date().required(), // Lưu cả ngày và thời gian bắt đầu
             exam_end: Joi.date().required(),
             room: Joi.string().required().min(1).max(5000).trim().strict()
@@ -40,6 +41,7 @@ const update = async (req, res, next) => {
             ologyId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             gradeId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             exam_date: Joi.date().iso(),
+            shift: Joi.number().integer(),
             exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
             exam_end: Joi.date(),
             room: Joi.string().min(1).max(5000).trim().strict()

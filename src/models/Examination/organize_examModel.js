@@ -17,6 +17,7 @@ const ORGANIZE_EXAM_COLLECTION_SCHEMA = Joi.object({
             ologyId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             gradeId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
             exam_date: Joi.date().required().iso(),
+            shift: Joi.number().integer(),
             exam_start: Joi.date().required(), // Lưu cả ngày và thời gian bắt đầu
             exam_end: Joi.date().required(),
             room: Joi.string().required().min(1).max(5000).trim().strict()
@@ -61,14 +62,45 @@ const findOneById = async (organize_examId) => {
     } catch (error) { throw new Error(error) }
 }
 
+const getModuleNameById = async (moduleId) => {
+    try {
+        const result = await GET_DB().collection('modules').findOne({
+            _id: new ObjectId(moduleId)
+        });
+        console.log('result: ', result)
+        return result ? result.modulename : null;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+const getGradeNameById = async (gradeId) => {
+    try {
+        const result = await GET_DB().collection('grades').findOne({
+            _id: new ObjectId(gradeId)
+        });
+        console.log('result: ', result)
+        return result ? result.gradename : null;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+
 const getAllOrganize_exams = async (query) => {
     try {
-        // Gọi phương thức từ MongoDB để lấy tất cả các khóa học
         const allOrganize_exams = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).find(query).toArray();
-        // Trả về kết quả
-        return allOrganize_exams;
+        const resultWithNames = await Promise.all(allOrganize_exams.map(async (organize_exam) => {
+            const moduleName = await getModuleNameById(organize_exam.moduleId);
+            console.log(moduleName)
+            const detailsWithNames = await Promise.all(organize_exam.details.map(async (detail) => {
+                const gradeName = await getGradeNameById(detail.gradeId);
+                return { ...detail, gradeName };
+            }));
+            return { ...organize_exam, moduleName, details: detailsWithNames };
+        }));
+        return resultWithNames;
     } catch (error) {
-        // Xử lý lỗi nếu có
         throw error;
     }
 }
@@ -77,10 +109,20 @@ const getDetails = async (id) => {
     try {
         const result = await GET_DB().collection(ORGANIZE_EXAM_COLLECTION_NAME).findOne({
             _id: new ObjectId(id)
-        })
-        return result
-    } catch (error) { throw new Error(error) }
+        });
+        if (!result) return null;
+
+        const moduleName = await getModuleNameById(result.moduleId);
+        const detailsWithNames = await Promise.all(result.details.map(async (detail) => {
+            const gradeName = await getGradeNameById(detail.gradeId);
+            return { ...detail, gradeName };
+        }));
+        return { ...result, moduleName, details: detailsWithNames };
+    } catch (error) {
+        throw error;
+    }
 }
+
 
 const getByModuleId = async (moduleId) => {
     try {

@@ -112,10 +112,25 @@ const getDetails = async (id) => {
     try {
         const result = await GET_DB().collection(QUESTION_BANK_COLLECTION_NAME).findOne({
             _id: new ObjectId(id)
-        })
-        return result
-    } catch (error) { throw new Error(error) }
+        });
+
+        // Lấy tên module từ moduleId
+        const module = await GET_DB().collection('modules').findOne({
+            _id: result.moduleId
+        });
+
+        // Kết hợp tên module vào kết quả trả về
+        const detailsWithModuleName = {
+            ...result,
+            moduleName: module ? module.modulename : null // Thêm tên module vào kết quả trả về
+        };
+
+        return detailsWithModuleName;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
+
 
 const deleteManyByQuestion_bankId = async (departmentId) => {
     try {
