@@ -124,6 +124,8 @@ const getAllGrade = async () => {
 
 const getDetails = async (id) => {
     try {
+        const currentTime = new Date(); // Lấy thời điểm hiện tại
+
         const result = await GET_DB().collection(GRADE_COLLECTION_NAME).aggregate([
             {
                 $match: {
@@ -142,12 +144,12 @@ const getDetails = async (id) => {
             {
                 $lookup: {
                     from: organize_examModel.ORGANIZE_EXAM_COLLECTION_NAME,
-                    let: { gradeId: '$_id' }, // Khai báo biến gradeId là _id của grade
+                    let: { gradeId: '$_id' },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
-                                    $in: ['$$gradeId', '$details.gradeId'] // Sử dụng $in để kiểm tra gradeId có trong mảng details.gradeId không
+                                    $in: ['$$gradeId', '$details.gradeId']
                                 }
                             }
                         },
@@ -157,21 +159,72 @@ const getDetails = async (id) => {
                                     $filter: {
                                         input: '$details',
                                         as: 'detail',
-                                        cond: { $eq: ['$$detail.gradeId', '$$gradeId'] } // Lọc chỉ lấy detail có gradeId cần tìm
+                                        cond: { $eq: ['$$detail.gradeId', '$$gradeId'] }
                                     }
                                 }
                             }
-                        },
-                        {
-                            $sort: { 'details.exam_start': 1 } // Sắp xếp theo thời gian tăng dần
                         }
                     ],
                     as: 'organizeExams'
                 }
             }
-        ]).toArray()
-        return result[0] || {}
-    } catch (error) { throw new Error(error) }
+        ]).toArray();
+
+        if (result.length === 0) return {}; // Trả về kết quả rỗng nếu không tìm thấy dữ liệu
+
+        // Lọc ra các kỳ thi đã qua thời gian hiện tại
+        const examsPassedCurrentTime = [];
+        const examsUpcoming = result[0].organizeExams.filter(exam => {
+            const examStartTime = new Date(exam.details[0].exam_end);
+            if (examStartTime > currentTime) {
+                return true; // Kỳ thi sắp tới
+            } else {
+                examsPassedCurrentTime.push(exam); // Kỳ thi đã qua thời gian hiện tại
+                return false;
+            }
+        });
+
+        // Sắp xếp các kỳ thi sắp tới theo thời gian tăng dần
+        examsUpcoming.sort((a, b) => {
+            const startTimeA = new Date(a.details[0].exam_start);
+            const startTimeB = new Date(b.details[0].exam_start);
+            return startTimeA - startTimeB;
+        });
+
+        // Ghép danh sách các kỳ thi đã qua thời gian hiện tại vào cuối danh sách
+        const organizeExams = [...examsUpcoming, ...examsPassedCurrentTime];
+
+        // Thêm trạng thái cho mỗi organizeExams
+        const examsWithStatus = organizeExams.map(exam => {
+            // Kiểm tra xem 'details' có tồn tại và có phần tử không
+            if (Array.isArray(exam.details) && exam.details.length > 0) {
+                // Lấy phần tử đầu tiên của mảng 'details'
+                const firstDetail = exam.details[0];
+                // Lấy giá trị 'exam_start' và 'exam_end' từ phần tử đầu tiên
+                const examStartTime = new Date(firstDetail.exam_start);
+                const examEndTime = new Date(firstDetail.exam_end);
+
+                // Kiểm tra thời gian hiện tại và áp dụng trạng thái tương ứng
+                if (currentTime < examStartTime) {
+                    return { ...exam, status: 0 }; // Trước giờ thi
+                } else if (currentTime >= examStartTime && currentTime <= examEndTime) {
+                    return { ...exam, status: 1 }; // Trong giờ thi
+                } else {
+                    return { ...exam, status: 2 }; // Sau giờ thi
+                }
+            } else {
+                // Trong trường hợp 'details' không tồn tại hoặc rỗng
+                return { ...exam, status: -1 }; // Trạng thái không xác định
+            }
+        });
+        
+        return {
+            ...result[0],
+            organizeExams: examsWithStatus
+        };
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 const pushStudentOrderIds = async (student) => {

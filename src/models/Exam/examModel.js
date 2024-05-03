@@ -81,42 +81,48 @@ const createAutoExam = async (moduleId, numberOfExams = 1) => {
             // Lấy organize_examId
             const organize_exam = await organize_examService.getByModuleId(moduleId);
             const organize_examId = organize_exam._id.toString(); 
-            console.log('organize_examId', organize_examId);
+            // console.log('organize_examId', organize_examId);
 
             // Lấy cấu trúc bài thi dựa trên moduleId
             const examStructure = await exam_structureService.getByModuleId(moduleId);
-            console.log('moduleId', moduleId);
-            console.log('examStructure', examStructure);
+            // console.log('moduleId', moduleId);
+            // console.log('examStructure', examStructure);
 
             // Trích xuất dữ liệu cần thiết từ examStructure
-            const { exam_format, exam_structure: structure } = examStructure;
-            console.log('exam_format', exam_format);
-            console.log('exam_structure', structure);
+            const { exam_format, structures } = examStructure;
+            // console.log('exam_format', exam_format);
+            // console.log('exam_structure', structures);
 
             // Initialize array to store generated questions
             const generatedQuestions = [];
 
             // Lặp qua cấu trúc bài thi
-            for (let j = 0; j < structure.length; j++) {
-                const { difficulty, chapters } = structure[j];
-                console.log(`Difficulty: ${difficulty}`);
+            for (let j = 0; j < structures.length; j++) {
+                const { difficulty, chapters } = structures[j];
+                // console.log(`Difficulty: ${difficulty}`);
                 for (const chapter of chapters) {
-                    console.log('Chapter:');
-                    console.log(chapter); // Log toàn bộ đối tượng chapter để xem cụ thể
+                    // console.log('Chapter:');
+                    // console.log(chapter); // Log toàn bộ đối tượng chapter để xem cụ thể
                 }
                 const questions = await question_bankService.getAllQuestion_banks(
                     moduleId,
                     exam_format,
                     difficulty,
-                    chapters.map(chapter => chapter.chapter)
+                    chapters.map(chapter => chapter)
+                    
                 );
-                
+                console.log(moduleId)
+                console.log(exam_format)
+                console.log(difficulty)
+                console.log(chapters.map(chapter => chapter)
+            )
+                console.log('questions: ', questions)
                 const randomIndex = Math.floor(Math.random() * questions.length);
                 generatedQuestions.push({
                     ...questions[randomIndex],
-                    question_score: structure[j].score // Lấy điểm số từ exam_structure
+                    question_score: structures[j].score // Lấy điểm số từ exam_structure
                 });
-                console.log('generatedQuestions: ', generatedQuestions);
+                // console.log('generatedQuestions: ', generatedQuestions);
             }
             
             // Calculate total score based on the number of questions
@@ -228,6 +234,19 @@ const deleteOneById = async (examId) => {
     } catch (error) { throw new Error(error) }
 }
 
+const deleteManyByModuleId = async (moduleId) => {
+    try {
+        const result = await GET_DB().collection(EXAM_COLLECTION_NAME).deleteMany({
+            moduleId: new ObjectId(moduleId)
+        });
+        console.log('deleteManyByModuleId - exams', result);
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+
 export const examModel = {
     EXAM_COLLECTION_NAME,
     EXAM_COLLECTION_SCHEMA,
@@ -239,4 +258,5 @@ export const examModel = {
     deleteManyByExamId,
     update,
     deleteOneById,
+    deleteManyByModuleId
 }

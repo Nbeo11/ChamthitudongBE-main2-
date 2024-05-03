@@ -100,13 +100,29 @@ const getAllQuestion_banks = async (query) => {
         // Gọi phương thức từ MongoDB để lấy tất cả các câu hỏi với các điều kiện lọc
         const allQuestion_banks = await GET_DB().collection(QUESTION_BANK_COLLECTION_NAME).find(query).toArray();
 
-        return allQuestion_banks;
+        const resultWithNames = await Promise.all(allQuestion_banks.map(async (qeuestion_bank) => {
+            const moduleName = await getModuleNameById(qeuestion_bank.moduleId);
+
+            return { ...qeuestion_bank, moduleName };
+        }));
+        return resultWithNames;
+
     } catch (error) {
         // Xử lý lỗi nếu có
         throw error;
     }
 }
 
+const getModuleNameById = async (moduleId) => {
+    try {
+        const result = await GET_DB().collection('modules').findOne({
+            _id: new ObjectId(moduleId)
+        });
+        return result ? result.modulename : null;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
 
 const getDetails = async (id) => {
     try {
@@ -114,15 +130,12 @@ const getDetails = async (id) => {
             _id: new ObjectId(id)
         });
 
-        // Lấy tên module từ moduleId
-        const module = await GET_DB().collection('modules').findOne({
-            _id: result.moduleId
-        });
+        const moduleName = await getModuleNameById(result.moduleId)
 
         // Kết hợp tên module vào kết quả trả về
         const detailsWithModuleName = {
             ...result,
-            moduleName: module ? module.modulename : null // Thêm tên module vào kết quả trả về
+            moduleName
         };
 
         return detailsWithModuleName;
