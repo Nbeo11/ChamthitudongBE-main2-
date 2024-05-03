@@ -9,8 +9,20 @@ const Router = express.Router()
 Router.route('/')
     .get(student_examController.getAllStudent_exams)
     .post(student_examValidation.createNew, student_examController.createNew)
-Router.route('/random')
-    .post(student_examModel.assignRandomExamToStudent)
+Router.route('/random/:moduleId')
+    .post(async (req, res, next) => {
+        try {
+            const { moduleId } = req.params;
+
+            const createdAutoExams = await student_examModel.assignRandomExamToStudent(moduleId);
+            res.status(201).json(createdAutoExams);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+Router.route('/:moduleId/:studentId/studentexam') // Thêm '/:student_examId' để truyền student_examId vào đây
+    .get(student_examController.findOneByModuleandStudentId); // Sử dụng hàm findOneByQuestionAndExamId trong controller
 
 Router.route('/:id')
     .get(student_examController.getDetails)

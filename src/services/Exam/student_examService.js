@@ -23,6 +23,16 @@ const createNew = async (reqBody) => {
     }
 }
 
+const findOneByModuleandStudentId = async (moduleId, studentId) => {
+    try {
+        const result = await student_examModel.findOneByModuleandStudentId(moduleId, studentId);
+        return result;
+
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 const getAllStudent_exams = async () => {
     try {
         // Gọi phương thức từ Model để lấy tất cả các khóa học
@@ -93,5 +103,6 @@ export const student_examService = {
     getDetails,
     getAllStudent_exams,
     update,
-    deleteItem
+    deleteItem,
+    findOneByModuleandStudentId
 }

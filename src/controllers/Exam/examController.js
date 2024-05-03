@@ -19,6 +19,16 @@ const getAllExams = async (req, res, next) => {
     }
 }
 
+const getByModuleId = async (req, res, next) => {
+    try {
+        const moduleId = req.params.moduleId
+        const allExams = await examService.getByModuleId(moduleId);
+        res.status(StatusCodes.OK).json(allExams);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const getDetails = async (req, res, next) => {
     try {
         const examId = req.params.id
@@ -54,5 +64,6 @@ export const examController = {
     getDetails,
     getAllExams,
     update,
-    deleteItem
+    deleteItem,
+    getByModuleId
 }

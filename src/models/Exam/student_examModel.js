@@ -101,11 +101,13 @@ const createNew = async (data) => {
 };
 
 
-const assignRandomExamToStudent = async () => {
+const assignRandomExamToStudent = async (moduleId) => {
     try {
         // Lấy danh sách sinh viên và đề thi
         const allStudents = await studentModel.getAllStudents();
-        const allExams = await examModel.getAllExams();
+        // console.log(allStudents)
+        console.log(moduleId)
+        const allExams = await examModel.getByModuleId(moduleId);
 
         // Số lượng sinh viên và đề thi
         const numStudents = allStudents.length;
@@ -164,6 +166,20 @@ const findOneById = async (student_examId) => {
         return result
     } catch (error) { throw new Error(error) }
 }
+
+const findOneByModuleandStudentId = async (moduleId, studentId) => {
+    try {
+        const result = await GET_DB().collection(STUDENT_EXAM_COLLECTION_NAME).findOne({
+            moduleId: new ObjectId(moduleId),
+            studentId: new ObjectId(studentId)
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 
 const findStudentExamsByExamId = async (examId) => {
     try {
@@ -300,5 +316,6 @@ export const student_examModel = {
     findStudentExamsByExamId,
     updateStudentExamsWithNewQuestions,
     calculateAndUpdateFinalScore,
-    assignRandomExamToStudent
+    assignRandomExamToStudent,
+    findOneByModuleandStudentId
 }

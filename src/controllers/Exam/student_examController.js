@@ -27,6 +27,19 @@ const getDetails = async (req, res, next) => {
     } catch (error) { next(error) }
 }
 
+const findOneByModuleandStudentId = async (req, res, next) => {
+    try {
+        const moduleId = req.params.moduleId; // Lấy question_bankId từ request params
+        const studentId = req.params.studentId; // Lấy student_examId từ request params
+        const result = await student_examService.findOneByModuleandStudentId(moduleId, studentId);
+        res.status(StatusCodes.OK).json(result);
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 const update = async (req, res, next) => {
     try {
         const student_examId = req.params.id;
@@ -54,5 +67,6 @@ export const student_examController = {
     getDetails,
     getAllStudent_exams,
     update,
-    deleteItem
+    deleteItem,
+    findOneByModuleandStudentId
 }

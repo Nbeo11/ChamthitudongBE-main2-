@@ -184,6 +184,21 @@ const getDetails = async (id) => {
     } catch (error) { throw new Error(error) }
 }
 
+const getByModuleId = async (moduleId) => {
+    try {
+        // Lấy tất cả các student thuộc grade
+        const result = await GET_DB().collection(EXAM_COLLECTION_NAME).find({
+            moduleId: new ObjectId(moduleId)
+        }).toArray();
+        console.log(result)
+        return result
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw error;
+    }
+}
+
+
 const deleteManyByExamId = async (departmentId) => {
     try {
         const result = await GET_DB().collection(EXAM_COLLECTION_NAME).deleteMany({
@@ -258,5 +273,6 @@ export const examModel = {
     deleteManyByExamId,
     update,
     deleteOneById,
-    deleteManyByModuleId
+    deleteManyByModuleId,
+    getByModuleId
 }

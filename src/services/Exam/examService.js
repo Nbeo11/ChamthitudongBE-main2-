@@ -29,6 +29,17 @@ const getAllExams = async () => {
     } catch (error) { throw error }
 }
 
+const getByModuleId = async (moduleId) => {
+    try {
+        // Lấy tất cả các student thuộc grade
+        const allExams = await examModel.getByModuleId(moduleId)
+        return allExams;
+    } catch (error) {
+        // Xử lý lỗi nếu có
+        throw error;
+    }
+}
+
 const getDetails = async (examId) => {
     try {
         const exam = await examModel.getDetails(examId)
@@ -83,5 +94,6 @@ export const examService = {
     getDetails,
     getAllExams,
     update,
-    deleteItem
+    deleteItem,
+    getByModuleId
 }

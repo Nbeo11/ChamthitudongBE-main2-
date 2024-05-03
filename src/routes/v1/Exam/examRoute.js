@@ -33,6 +33,10 @@ Router.route('/delete/:moduleId')
         }
     });
 
+    Router.route('/module/:moduleId')
+    .get(examController.getByModuleId)
+
+
 Router.route('/:id')
     .get(examController.getDetails)
     .put(examValidation.update, examController.update)
