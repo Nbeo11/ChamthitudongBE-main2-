@@ -12,9 +12,12 @@ const createNew = async (req, res, next) => {
         moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         time_countdown: Joi.number().integer().min(0),
+        time_finish: Joi.string().min(1).max(5000).trim().strict(),
         exam_date: Joi.date().iso(),
         exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
         exam_end: Joi.date(),
+        start_examAt: Joi.date(),
+        end_examAt: Joi.date(),
         room: Joi.string().min(1).max(5000).trim().strict(),
         question: Joi.array().items(
             Joi.object({
@@ -41,9 +44,12 @@ const update = async (req, res, next) => {
         moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         time_countdown: Joi.number().integer().min(0),
+        time_finish: Joi.string().min(1).max(5000).trim().strict(),
         exam_date: Joi.date().iso(),
         exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
         exam_end: Joi.date(),
+        start_examAt: Joi.date(),
+        end_examAt: Joi.date(),
         room: Joi.string().min(1).max(5000).trim().strict(),
         question: Joi.array().items(
             Joi.object({

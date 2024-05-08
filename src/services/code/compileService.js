@@ -18,7 +18,7 @@ exports.compileCppCode = async (sourceCode, inputs = []) => {
         const fileout = `${jobId}`
 
         // Xác định đường dẫn đến file exe đã tạo
-        const exeFilePath = path.join(dirCodes,fileout);
+        const exeFilePath = path.join(dirCodes, fileout);
 
         // Ghi source code vào file tạm
 
@@ -31,13 +31,23 @@ exports.compileCppCode = async (sourceCode, inputs = []) => {
         const compileProcess = spawn('g++', ['-o', exeFilePath, filepath]);
 
         await new Promise((resolve, reject) => {
+            // Sau khi quy trình biên dịch đã kết thúc, kiểm tra và xóa tệp exe
             compileProcess.on('close', (code) => {
                 if (code === 0) {
+                    // Chờ cho quy trình biên dịch kết thúc trước khi xóa tệp exe
+                    fs.unlink(exeFilePath, (err) => {
+                        if (err) {
+                            console.error('Error deleting exe file:', err);
+                        } else {
+                            console.log('Exe file deleted successfully');
+                        }
+                    });
                     resolve();
                 } else {
                     reject(new Error('Compilation failed with code ' + code));
                 }
             });
+
         });
 
         console.log('Compilation successful');
@@ -82,7 +92,7 @@ exports.compileCppCode = async (sourceCode, inputs = []) => {
 
         fs.unlinkSync(`${filepath}`);
         fs.unlinkSync(`${exeFilePath}.exe`);
-        
+
         // Trả về kết quả của quá trình biên dịch và thực thi
         return { message: 'Compilation and execution successful', results };
 

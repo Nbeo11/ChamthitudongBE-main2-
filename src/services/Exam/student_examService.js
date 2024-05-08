@@ -3,7 +3,6 @@
 // eslint-disable-next-line quotes
 import { StatusCodes } from 'http-status-codes'
 import { student_examModel } from '~/models/Exam/student_examModel'
-import { studentcodeModel } from '~/models/code/studentcodeModel'
 import ApiError from '~/utils/ApiError'
 
 const createNew = async (reqBody) => {
@@ -56,23 +55,13 @@ const getDetails = async (student_examId) => {
 
 const update = async (id, reqBody) => {
     try {
-        // Lấy thông tin câu hỏi và điểm từ reqBody
-        const { question_bankId, scores } = reqBody;
-
-        // Kiểm tra nếu không có question_bankId hoặc điểm, hoặc nếu điểm không phải là một đối tượng
-        if (!question_bankId || !scores || typeof scores !== 'object') {
-            throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid request body!');
+        const updateData = {
+            ...reqBody,
+            updatedAt: Date.now()
         }
-
-        // Cập nhật điểm cho mỗi câu hỏi
-        const updatedQuestions = [];
-        for (const [questionId, score] of Object.entries(scores)) {
-            const updatedQuestion = await studentcodeModel.findOneByQuestionId(question_bankId);
-            updatedQuestions.push(updatedQuestion);
-        }
-
-        // Trả về danh sách câu hỏi đã được cập nhật điểm
-        return updatedQuestions;
+        const updatedContest = await student_examModel.update(id, updateData);
+        console.log ('newquestion: ', reqBody.question)
+        return updatedContest;
     } catch (error) {
         throw error;
     }

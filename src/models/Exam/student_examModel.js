@@ -18,9 +18,12 @@ const STUDENT_EXAM_COLLECTION_SCHEMA = Joi.object({
     moduleId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     organize_examId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     time_countdown: Joi.number().integer().min(0),
+    time_finish: Joi.string().min(1).max(5000).trim().strict(),
     exam_date: Joi.date().iso(),
     exam_start: Joi.date(), // Lưu cả ngày và thời gian bắt đầu
     exam_end: Joi.date(),
+    start_examAt: Joi.date(),
+    end_examAt: Joi.date(),
     room: Joi.string().min(1).max(5000).trim().strict(),
     question: Joi.array().items(
         Joi.object({
@@ -36,7 +39,7 @@ const STUDENT_EXAM_COLLECTION_SCHEMA = Joi.object({
 });
 
 
-const INVALID_UPDATE_FIELDS = ['_id', 'studentId', 'examId', 'createdAt']
+const INVALID_UPDATE_FIELDS = ['_id', 'studentId', 'examId', 'organize_examId', 'moduleId', 'createdAt']
 
 const validateBeforeCreate = async (data) => {
     return await STUDENT_EXAM_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
@@ -223,24 +226,37 @@ const deleteManyByStudent_examId = async (departmentId) => {
     } catch (error) { throw new Error(error) }
 }
 
+// Trong hàm update, kiểm tra và chuyển đổi giá trị question_bankId thành ObjectId nếu có
 const update = async (student_examId, updateData) => {
     try {
-        Object.keys(updateData).forEach(fileName => {
-            if (INVALID_UPDATE_FIELDS.includes(fileName)) {
-                delete updateData[fileName]
+        // Kiểm tra và chuyển đổi giá trị question_bankId thành ObjectId
+        if (updateData.question) {
+            updateData.question = updateData.question.map(item => ({
+                ...item,
+                question_bankId: new ObjectId(item.question_bankId)
+            }));
+        }
+
+        // Loại bỏ các trường không hợp lệ khác khỏi updateData
+        Object.keys(updateData).forEach(fieldName => {
+            if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+                delete updateData[fieldName];
             }
-        })
+        });
+
+        // Thực hiện cập nhật
         const result = await GET_DB().collection(STUDENT_EXAM_COLLECTION_NAME).findOneAndUpdate(
             { _id: new ObjectId(student_examId) },
             { $set: updateData },
             { returnDocument: 'after' }
         );
 
-        return result
+        return result;
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
 
 const deleteOneById = async (student_examId) => {
     try {
