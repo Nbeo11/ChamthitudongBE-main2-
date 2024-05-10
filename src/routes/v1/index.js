@@ -1,6 +1,5 @@
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { userRoute } from '../../../build/src/routes/v1/userRoute'
 import { difficultRoute } from './Exam/difficultRoute'
 import { examRoute } from './Exam/examRoute'
 import { exam_structureRoute } from './Exam/exam_structureRoute'
@@ -56,8 +55,6 @@ Router.use('/departments', departmentRoute)
 /**Teacher APIs *///
 Router.use('/teachers', teacherRoute)
 
-/**User APIs *///
-Router.use('/users', userRoute)
 
 /**Authentication APIs *///
 Router.use('/auth', authRoute);
