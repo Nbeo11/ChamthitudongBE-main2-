@@ -44,19 +44,15 @@ export const loginUser = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { user_id } = req.params; // Thay đổi id thành user_id
         const { oldPassword, newPassword, confirmPassword } = req.body;
 
-        if (!id || !oldPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ message: 'Missing id, oldPassword, newPassword, or confirmPassword' });
+        if (!user_id || !oldPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ message: 'Missing user_id, oldPassword, newPassword, or confirmPassword' });
         }
 
-        if (!ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid id' });
-        }
-
-        // Lấy thông tin người dùng từ cơ sở dữ liệu
-        const user = await GET_DB().collection('users').findOne({ _id: new ObjectId(id) });
+        // Lấy thông tin người dùng từ cơ sở dữ liệu dựa trên user_id
+        const user = await GET_DB().collection('users').findOne({ user_id: new ObjectId(user_id) });
 
         // Kiểm tra mật khẩu cũ bằng cách so sánh với mật khẩu đã lưu trong cơ sở dữ liệu bằng bcrypt
         const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
@@ -77,9 +73,9 @@ export const updatePassword = async (req, res) => {
         // Băm mật khẩu mới trước khi cập nhật
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-        // Cập nhật mật khẩu mới cho người dùng
+        // Cập nhật mật khẩu mới cho người dùng dựa trên user_id
         const result = await GET_DB().collection('users').updateOne(
-            { _id: new ObjectId(id) },
+            { user_id: new ObjectId(user_id) }, // Thay đổi _id thành user_id
             { $set: { password: hashedNewPassword } }
         );
 
